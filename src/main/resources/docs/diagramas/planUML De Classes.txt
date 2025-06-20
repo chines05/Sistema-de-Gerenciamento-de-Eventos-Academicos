@@ -1,0 +1,115 @@
+@startuml
+class Usuario {
+  <<abstract>>
+  -id: Integer
+  -nome: String
+  -email: String
+  -senha: String
+  +login(): boolean
+  +logout(): void
+}
+
+class Administrador {
+  +criarEvento(): boolean
+  +editarEvento(Evento): boolean
+  +excluirEvento(Integer): boolean
+  +cadastrarAtividade(): boolean
+  +definirTaxaPadrao(TipoParticipante, Double): void
+  +confirmarPagamento(Inscricao): boolean
+  +visualizarEventos(): List<Evento>
+  +visualizarInscritos(Evento): List<Participante>
+  +visualizarStatusPagamentoUsuario(Participante): String
+  +gerenciarValorInscricaoPorParticipante(Participante, Double): boolean
+}
+
+abstract class Participante {
+  -cpf: String
+  -taxaInscricao: Double
+  +calcularTaxa(): Double
+  +InscreverEmEvento(Evento): boolean
+  +inscreverEmAtividade(Atividade): boolean
+  +efetuarPagamento(Inscricao): boolean
+  +visualizarEventosInscritos(): List<Evento>
+  +visualizarAtividadesInscritas(): List<Atividade>
+  +StatusPagamento(): String
+  +CancelarInscricoes(Inscricao): boolean
+}
+
+class Aluno {
+  -matricula: String
+}
+
+class Professor {
+  -instituicao: String
+}
+
+class Profissional {
+  -empresa: String
+}
+
+class Evento {
+  -id: Integer
+  -nome: String
+  -descricao: String
+  -dataInicio: LocalDate
+  -dataFim: LocalDate
+  +adicionarAtividade(): boolean
+  +getAtividades(): List<Atividade>
+}
+
+class Atividade {
+  -id: Integer
+  -nome: String
+  -descricao: String
+  -dataRealizacao: LocalDateTime
+  -limiteInscritos: Integer
+  -tipo: String
+  +temVagas(): boolean
+  +getInscritos(): List<Participante>
+}
+
+class Inscricao {
+  -id: Integer
+  -dataInscricao: LocalDate
+  -status: String
+  +cancelarInscricao(): boolean
+  +getStatus(): String
+}
+
+class Pagamento {
+  -id: Integer
+  -valor: Double
+  -dataPagamento: LocalDate
+  -confirmado: boolean
+  +confirmarPagamento(): boolean
+  +estaConfirmado(): boolean
+}
+
+' --- RELACIONAMENTOS ---
+Usuario <|-- Administrador
+Usuario <|-- Participante
+Participante <|-- Aluno
+Participante <|-- Professor
+Participante <|-- Profissional
+
+Evento "1" *-- "0..*" Atividade: contém >
+Participante "1" -- "0..*" Inscricao: realiza >
+Atividade "1" -- "0..*" Inscricao: possui >
+Inscricao "1" -- "1" Pagamento: requer >
+
+' --- ENUMS ---
+enum TipoAtividade {
+  PALESTRA
+  CURSO
+  SIMPOSIO
+}
+
+enum StatusInscricao {
+  PENDENTE
+  CONFIRMADA
+  CANCELADA
+}
+
+Atividade --> TipoAtividade
+Inscricao --> StatusInscricao
+@enduml

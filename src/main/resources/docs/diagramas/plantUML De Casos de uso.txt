@@ -1,0 +1,57 @@
+@startuml
+left to right direction
+
+actor Administrador as admin
+actor Participante as part
+
+' === BLOCOS PARALELOS ===
+rectangle "ADMINISTRADOR" as blocoAdmin {
+  (Fazer Login) as loginA
+  (Fazer Logout) as logoutA
+  (Criar Eventos) as criar
+  (Editar Eventos) as editar
+  (Excluir Eventos) as excluir
+  (Cadastrar Atividades) as cadastrarAtiv
+  (Definir Limite Vagas) as definirVagas
+  (Confirmar Pagamentos) as confirmarPag
+  (Visualizar Inscritos) as verInscritos
+  (Definir Taxas) as definirTaxas
+  (Relatórios Participação) as relPart
+  (Relatórios Financeiros) as relFin
+}
+
+rectangle "PARTICIPANTE" as blocoPart {
+  (Fazer Login) as loginP
+  (Fazer Logout) as logoutP
+  (Cadastrar Aluno) as aluno
+  (Cadastrar Professor) as prof
+  (Cadastrar Profissional) as pro
+  (Inscrição Eventos) as insEvento
+  (Inscrição Atividades) as insAtiv
+  (Efetuar Pagamento) as pagar
+  (Minhas Inscrições) as minhasInsc
+  (Status Pagamento) as status
+  (Cancelar Inscrição) as cancelar
+}
+
+' === CONEXÕES ===
+admin --> blocoAdmin
+part --> blocoPart
+
+' === NOTAS ===
+note right of blocoPart
+  <b>Perfis:</b>
+  • Aluno
+  • Professor
+  • Profissional
+end note
+
+' === AJUSTES VISUAIS ===
+skinparam {
+  Rectangle {
+    BackgroundColor #F5F5F5
+    BorderColor #333
+  }
+  ActorBorderColor #000000
+}
+@enduml
