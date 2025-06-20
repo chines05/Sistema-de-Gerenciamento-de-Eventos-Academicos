@@ -10,25 +10,31 @@ public class ConnectionFactory {
     private static final String URL = "jdbc:sqlite:src/main/resources/eventos_academicos.db";
 
     public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(URL);
+        try {
+            Class.forName("org.sqlite.JDBC");
+            return DriverManager.getConnection(URL);
+        } catch (ClassNotFoundException e) {
+            throw new SQLException("Driver JDBC não encontrado", e);
+        }
     }
 
     public static void criarTabelas() {
         String sqlUsuarios = """
-            CREATE TABLE IF NOT EXISTS Usuario (
+            CREATE TABLE IF NOT EXISTS User (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,s
+                nome TEXT NOT NULL,
                 email TEXT UNIQUE NOT NULL,
-                password TEXT NOT NULL,
-                role TEXT CHECK(role IN ('ADMIN', 'ALUNO', 'PROFESSOR', 'PROFISSIONAL'))
+                senha TEXT NOT NULL,
+                role TEXT CHECK(role IN ('ADMIN', 'ALUNO', 'PROFESSOR', 'PROFISSIONAL')),
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             );
             """;
 
         String sqlEventos = """
             CREATE TABLE IF NOT EXISTS Evento (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                description TEXT,
+                nome TEXT NOT NULL,
+                descricao TEXT,
                 data_inicio TEXT NOT NULL,
                 data_fim TEXT NOT NULL
             );
