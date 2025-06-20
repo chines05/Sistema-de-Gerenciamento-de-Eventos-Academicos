@@ -1,23 +1,28 @@
 package view;
 
+import dao.EventoDAO;
 import exceptions.EmailDuplicadoException;
 import exceptions.EmailInvalidoException;
 import exceptions.SenhaFracaException;
 import model.Admin;
 import dao.UserDAO;
+import model.Evento;
 import model.Participante;
 import model.User;
 import utils.ConnectionFactory;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
 
 //        criarTabelas();
+        visualizarEventos();
 
-        menuLogin();
+        //menuLogin();
 
     }
 
@@ -77,7 +82,7 @@ public class Main {
             User usuario = userDAO.login(email, senha);
 
             if (usuario != null) {
-                System.out.println("Login bem-sucedido! Bem-vindo, " + usuario.getNome());
+                System.out.println("\nLogin bem-sucedido! Bem-vindo, " + usuario.getNome());
 
 
                 if (usuario instanceof Admin) {
@@ -179,59 +184,36 @@ public class Main {
     }
 
     public static void menuAdmin() {
+        Scanner sc = new Scanner(System.in);
+
         System.out.println("Bem-vindo ao menu do admin!");
 
         int opcao;
         do {
             System.out.println("\nEscolha uma opção:");
-            System.out.println("1 - Criar Eventos");
-            System.out.println("2 - Editar Eventos");
-            System.out.println("3 - Excluir Eventos");
-            System.out.println("4 - Cadastrar Atividades");
-            System.out.println("5 - Definir Limite de Vagas");
-            System.out.println("6 - Confirmar Pagamentos");
-            System.out.println("7 - Visualizar Inscritos");
-            System.out.println("8 - Definir Taxas");
-            System.out.println("9 - Relatórios Participação");
-            System.out.println("10 - Relatórios Financeiros");
-            System.out.println("11 - Sair");
-            System.out.print("Opção: ");
+            System.out.println("1 - Visualizar Eventos");
+            System.out.println("2 - Criar Evento");
+            System.out.println("3 - Editar Evento");
+            System.out.println("4 - Excluir Evento");
+            System.out.println("5 - Cadastrar Atividade");
+            System.out.println("6 - Definir Limite de Vagas");
+            System.out.println("7 - Confirmar Pagamentos");
+            System.out.println("8 - Visualizar Inscritos");
+            System.out.println("9 - Definir Taxas");
+            System.out.println("10 - Relatórios Participação");
+            System.out.println("11 - Relatórios Financeiros");
+            System.out.println("12 - Sair");
 
-
-
-            opcao = new Scanner(System.in).nextInt();
+            opcao = sc.nextInt();
 
             switch (opcao) {
                 case 1:
-                    // Criar Eventos
+                    visualizarEventos();
                     break;
                 case 2:
-                    // Editar Eventos
+                    criarEvento(sc);
                     break;
-                case 3:
-                    // Excluir Eventos
-                    break;
-                case 4:
-                    // Cadastrar Atividades
-                    break;
-                case 5:
-                    // Definir Limite de Vagas
-                    break;
-                case 6:
-                    // Confirmar Pagamentos
-                    break;
-                case 7:
-                    // Visualizar Inscritos
-                    break;
-                case 8:
-                    // Definir Taxas
-                    break;
-                case 9:
-                    // Relatórios Participação
-                    break;
-                case 10:
-                    // Relatórios Financeiros
-                    break;
+
                 case 11:
                     logout();
                     break;
@@ -240,6 +222,48 @@ public class Main {
             }
         } while (opcao != 11);
 
+    }
+
+    public static void criarEvento(Scanner sc) {
+
+        System.out.println("\n--- Criar Evento ---");
+        System.out.println("Digite as informações do evento:");
+
+        sc.nextLine();
+
+        System.out.print("Nome do Evento: ");
+        String nome = sc.nextLine();
+
+        System.out.print("Descrição: ");
+        String descricao = sc.nextLine();
+
+        System.out.print("Data Início (YYYY-MM-DD): ");
+        String dataInicio = sc.nextLine();
+
+        System.out.print("Data Fim (YYYY-MM-DD): ");
+        String dataFim = sc.nextLine();
+
+        System.out.print("Total de Vagas: ");
+        int vagas = sc.nextInt();
+
+        try {
+            Evento novoEvento = new Evento(nome, descricao, dataInicio, dataFim, vagas, vagas);
+            new EventoDAO().criarEvento(novoEvento);
+            System.out.println("Evento criado com sucesso! ID: " + novoEvento.getId());
+        } catch (SQLException e) {
+            System.err.println("Erro ao criar evento: " + e.getMessage());
+        }
+    }
+
+    public static void visualizarEventos() {
+        try {
+            String listaFormatada = new EventoDAO().listarEventosFormatados();
+            System.out.println(listaFormatada);
+        } catch (SQLException e) {
+            System.err.println("Erro ao listar eventos: " + e.getMessage());
+        }
+
+        menuAdmin();
     }
 
     public static void menuParticipante() {

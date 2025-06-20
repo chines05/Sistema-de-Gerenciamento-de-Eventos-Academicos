@@ -42,8 +42,8 @@ public class ConnectionFactory {
         );
         """;
 
-        String sqlInscricoes = """
-        CREATE TABLE IF NOT EXISTS Inscricao (
+        String sqlEvento_user = """
+        CREATE TABLE IF NOT EXISTS evento_user (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             usuario_id INTEGER NOT NULL,
             evento_id INTEGER NOT NULL,
@@ -55,20 +55,11 @@ public class ConnectionFactory {
         );
         """;
 
-//        String sqlInsertAdmin = """
-//        INSERT INTO User (nome, email, senha, role)
-//        VALUES ('Admin', 'admin@email.com', 'Admin123', 'ADMIN');
-//        """;
-//
-//        String sqlRemoveAdmin = """
-//        DELETE FROM User WHERE email = 'admin@email.com';
-//        """;
-
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement()) {
             stmt.execute(sqlUsuarios);
             stmt.execute(sqlEventos);
-            stmt.execute(sqlInscricoes);
+            stmt.execute(sqlEvento_user);
             System.out.println("Tabelas criadas com sucesso!");
         } catch (SQLException e) {
             System.err.println("Erro ao criar tabelas: " + e.getMessage());
