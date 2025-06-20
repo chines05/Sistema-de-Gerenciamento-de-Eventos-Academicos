@@ -20,30 +20,55 @@ public class ConnectionFactory {
 
     public static void criarTabelas() {
         String sqlUsuarios = """
-            CREATE TABLE IF NOT EXISTS User (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                nome TEXT NOT NULL,
-                email TEXT UNIQUE NOT NULL,
-                senha TEXT NOT NULL,
-                role TEXT CHECK(role IN ('ADMIN', 'ALUNO', 'PROFESSOR', 'PROFISSIONAL')),
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-            );
-            """;
+        CREATE TABLE IF NOT EXISTS User (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT NOT NULL,
+            email TEXT UNIQUE NOT NULL,
+            senha TEXT NOT NULL,
+            role TEXT CHECK(role IN ('ADMIN', 'ALUNO', 'PROFESSOR', 'PROFISSIONAL')),
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
+        """;
 
         String sqlEventos = """
-            CREATE TABLE IF NOT EXISTS Evento (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                nome TEXT NOT NULL,
-                descricao TEXT,
-                data_inicio TEXT NOT NULL,
-                data_fim TEXT NOT NULL
-            );
-            """;
+        CREATE TABLE IF NOT EXISTS Evento (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT NOT NULL,
+            descricao TEXT,
+            data_inicio TEXT NOT NULL,
+            data_fim TEXT NOT NULL,
+            vagas_total INTEGER,
+            vagas_disponivel INTEGER
+        );
+        """;
+
+        String sqlInscricoes = """
+        CREATE TABLE IF NOT EXISTS Inscricao (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            usuario_id INTEGER NOT NULL,
+            evento_id INTEGER NOT NULL,
+            data_inscricao DATETIME DEFAULT CURRENT_TIMESTAMP,
+            status_pagamento TEXT DEFAULT 'PENDENTE',
+            FOREIGN KEY (usuario_id) REFERENCES User(id),
+            FOREIGN KEY (evento_id) REFERENCES Evento(id),
+            UNIQUE (usuario_id, evento_id)
+        );
+        """;
+
+//        String sqlInsertAdmin = """
+//        INSERT INTO User (nome, email, senha, role)
+//        VALUES ('Admin', 'admin@email.com', 'Admin123', 'ADMIN');
+//        """;
+//
+//        String sqlRemoveAdmin = """
+//        DELETE FROM User WHERE email = 'admin@email.com';
+//        """;
 
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement()) {
             stmt.execute(sqlUsuarios);
             stmt.execute(sqlEventos);
+            stmt.execute(sqlInscricoes);
             System.out.println("Tabelas criadas com sucesso!");
         } catch (SQLException e) {
             System.err.println("Erro ao criar tabelas: " + e.getMessage());

@@ -1,32 +1,23 @@
 package view;
 
+import exceptions.EmailDuplicadoException;
+import exceptions.EmailInvalidoException;
+import exceptions.SenhaFracaException;
 import model.Admin;
 import dao.UserDAO;
 import model.Participante;
 import model.User;
 import utils.ConnectionFactory;
 
+import java.sql.SQLException;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
 
-//        System.out.println("Criando admin...");
-//
-//        try {
-//            Admin admin = new Admin("Chines Porto", "chines@email.com", "chines05");
-//            UserDAO userDAO = new UserDAO();
-//
-//            userDAO.createUser(admin);
-//            System.out.println("Admin criado com ID: " + admin.getId());
-//
-//        } catch (Exception e) {
-//            System.err.println("Erro ao criar usuário: " + e.getMessage());
-//        }
-
+//        criarTabelas();
 
         menuLogin();
-
 
     }
 
@@ -94,7 +85,7 @@ public class Main {
                 } else if (usuario instanceof Participante) {
                     Participante participante = (Participante) usuario;
                     System.out.println("Você está logado como: " + participante.getRole());
-                    // menuParticipante();
+                    menuParticipante();
                     System.out.println("Área do participante (em desenvolvimento)");
                 }
             } else {
@@ -119,58 +110,72 @@ public class Main {
         System.out.println("Informe seus dados.");
 
         System.out.print("Nome: ");
-        String nome = sc.nextLine();
+        String nome = sc.nextLine().trim();
 
         System.out.print("Email: ");
-        String email = sc.nextLine();
+        String email = sc.nextLine().trim();
 
-        System.out.print("Senha: ");
-        String senha = sc.nextLine();
+        System.out.print("Senha (mínimo 6 caracteres): ");
+        String senha = sc.nextLine().trim();
 
-        int opcaoRole;
-        String role = "";
-
-        System.out.println("\nEscolha uma opção de cadastro:");
-
-        System.out.println("1 - Aluno");
-        System.out.println("2 - Professor");
-        System.out.println("3 - Profissional");
-        System.out.println("4 - Voltar");
-        System.out.println("5 - Sair");
-
-        System.out.print("Opção: ");
-
-        opcaoRole = sc.nextInt();
-
-        switch (opcaoRole) {
-            case 1:
-                role = "ALUNO";
-                break;
-            case 2:
-                role = "PROFESSOR";
-                break;
-            case 3:
-                role = "PROFISSIONAL";
-                break;
-            case 4:
-                System.out.println("Voltando ao menu de login...");
-                menuLogin();
-                break;
-            case 5:
-                System.out.println("Saindo...");
-                logout();
-                break;
-            default:
-                System.out.println("Opção inválida!");
-        }
+        String role = selecionarRole(sc);
+        if (role == null) return;
 
         try {
             UserDAO userDAO = new UserDAO();
-            userDAO.createUser(new Participante(nome, email, senha, role));
+            Participante novoUsuario = new Participante(nome, email, senha, role);
+            userDAO.createUser(novoUsuario);
+            System.out.println("Cadastro realizado com sucesso!");
+        } catch (EmailDuplicadoException e) {
+            System.err.println("Erro no cadastro: " + e.getMessage());
+            pause(1000);
+        } catch (EmailInvalidoException e) {
+            System.err.println("Erro no cadastro: " + e.getMessage());
+            pause(1000);
+        } catch (SenhaFracaException e) {
+            System.err.println("Erro no cadastro: " + e.getMessage());
+            pause(1000);
+        } catch (SQLException e) {
+            System.err.println("Erro no banco de dados: " + e.getMessage());
+            pause(1000);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            System.err.println("Erro inesperado: " + e.getMessage());
+            pause(1000);
         }
 
+    }
+
+    private static void pause(int millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    private static String selecionarRole(Scanner sc) {
+        while (true) {
+            System.out.println("\nTipo de conta:");
+            System.out.println("1 - Aluno");
+            System.out.println("2 - Professor");
+            System.out.println("3 - Profissional");
+            System.out.println("4 - Voltar");
+            System.out.print("Opção: ");
+
+            try {
+                int opcao = Integer.parseInt(sc.nextLine());
+                switch (opcao) {
+                    case 1: return "ALUNO";
+                    case 2: return "PROFESSOR";
+                    case 3: return "PROFISSIONAL";
+                    case 4: return null;
+                    default: System.out.println("Opção inválida!");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Digite apenas números!");
+            }
+            pause(1000);
+        }
     }
 
     public static void menuAdmin() {
@@ -235,6 +240,68 @@ public class Main {
             }
         } while (opcao != 11);
 
+    }
+
+    public static void menuParticipante() {
+        System.out.println("Bem-vindo ao menu do participante!");
+
+        int opcao;
+        do {
+            System.out.println("\nEscolha uma opção:");
+            System.out.println("1 - Visualizar Eventos");
+            System.out.println("2 - Inscrever-se em Evento");
+            System.out.println("3 - Visualizar Atividades");
+            System.out.println("4 - Inscrever-se em Atividade");
+            System.out.println("5 - Visualizar Informações do Evento");
+            System.out.println("6 - Visualizar Informações da Atividade");
+            System.out.println("7 - Visualizar Eventos Inscritos");
+            System.out.println("8 - Visualizar Atividades Inscritas");
+            System.out.println("9 - Visualizar Informações do Pagamento");
+            System.out.println("10 - Cancelar Inscrição");
+            System.out.println("11 - Sair");
+            System.out.print("Opção: ");
+
+            opcao = new Scanner(System.in).nextInt();
+
+            switch (opcao) {
+                case 1:
+                    // Visualizar Eventos
+                    break;
+                case 2:
+                    // Inscrever-se em Eventos
+                    break;
+                case 3:
+                    // Visualizar Atividades
+                    break;
+                case 4:
+                    // Visualizar Informações do Evento
+                    break;
+                case 5:
+                    // Visualizar Informações da Atividade
+                    break;
+                case 6:
+                    // Visualizar Informações do Participante
+                    break;
+                case 7:
+                    // Visualizar Informações do Aluno
+                    break;
+                case 8:
+                    // Visualizar Informações do Professor
+                    break;
+                case 9:
+                    // Visualizar Informações do Profissional
+                    break;
+                case 10:
+                    // Visualizar Informações do Pagamento
+                    break;
+                case 11:
+                    logout();
+                    break;
+                default:
+                    System.out.println("Opção inválida!");
+            }
+
+        } while (opcao != 11);
     }
 
 }
