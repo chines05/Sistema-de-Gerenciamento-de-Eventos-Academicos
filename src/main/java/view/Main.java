@@ -3,6 +3,7 @@ package view;
 import model.Admin;
 import dao.UserDAO;
 import model.Participante;
+import model.User;
 import utils.ConnectionFactory;
 
 import java.util.Scanner;
@@ -82,16 +83,18 @@ public class Main {
 
         try {
             UserDAO userDAO = new UserDAO();
-            Participante usuario = userDAO.login(email, senha);
+            User usuario = userDAO.login(email, senha);
 
             if (usuario != null) {
                 System.out.println("Login bem-sucedido! Bem-vindo, " + usuario.getNome());
 
-                // Verifica se é admin para redirecionar
-                if ("ADMIN".equals(usuario.getRole())) {
+
+                if (usuario instanceof Admin) {
                     menuAdmin();
-                } else {
-                    // menuParticipante(); // Você pode implementar este método depois
+                } else if (usuario instanceof Participante) {
+                    Participante participante = (Participante) usuario;
+                    System.out.println("Você está logado como: " + participante.getRole());
+                    // menuParticipante();
                     System.out.println("Área do participante (em desenvolvimento)");
                 }
             } else {

@@ -29,7 +29,7 @@ public class UserDAO {
         }
     }
 
-    public Participante login(String email, String senha) throws SQLException {
+    public User login(String email, String senha) throws SQLException {
         String sql = "SELECT * FROM User WHERE email = ? AND senha = ?";
 
         try (Connection conn = ConnectionFactory.getConnection();
@@ -40,14 +40,26 @@ public class UserDAO {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    Participante participante = new Participante(
-                            rs.getString("nome"),
-                            rs.getString("email"),
-                            rs.getString("senha"),
-                            rs.getString("role")
-                    );
-                    participante.setId(rs.getInt("id"));
-                    return participante;
+                    String role = rs.getString("role");
+
+                    if ("ADMIN".equals(role)) {
+                        Admin admin = new Admin(
+                                rs.getString("nome"),
+                                rs.getString("email"),
+                                rs.getString("senha")
+                        );
+                        admin.setId(rs.getInt("id"));
+                        return admin;
+                    } else {
+                        Participante participante = new Participante(
+                                rs.getString("nome"),
+                                rs.getString("email"),
+                                rs.getString("senha"),
+                                role
+                        );
+                        participante.setId(rs.getInt("id"));
+                        return participante;
+                    }
                 }
             }
         }
