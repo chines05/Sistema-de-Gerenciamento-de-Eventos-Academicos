@@ -20,9 +20,9 @@ public class Main {
     public static void main(String[] args) {
 
 //        criarTabelas();
-        visualizarEventos();
+        //visualizarEventos();
 
-        //menuLogin();
+        menuLogin();
 
     }
 
@@ -56,7 +56,7 @@ public class Main {
                     break;
                 case 3:
                     System.out.println("Saindo...");
-                    break;
+                    return;
                 default:
                     System.out.println("Opção inválida!");
             }
@@ -87,11 +87,14 @@ public class Main {
 
                 if (usuario instanceof Admin) {
                     menuAdmin();
+
+                    return;
                 } else if (usuario instanceof Participante) {
                     Participante participante = (Participante) usuario;
                     System.out.println("Você está logado como: " + participante.getRole());
                     menuParticipante();
-                    System.out.println("Área do participante (em desenvolvimento)");
+
+                    return;
                 }
             } else {
                 System.out.println("Email ou senha incorretos!");
@@ -104,7 +107,7 @@ public class Main {
 
     public static void logout() {
 
-        menuLogin();
+        System.out.println("Deslogado com sucesso!");
 
     }
 
@@ -204,6 +207,8 @@ public class Main {
             System.out.println("11 - Relatórios Financeiros");
             System.out.println("12 - Sair");
 
+            System.out.print("Opção: ");
+
             opcao = sc.nextInt();
 
             switch (opcao) {
@@ -213,15 +218,29 @@ public class Main {
                 case 2:
                     criarEvento(sc);
                     break;
-
-                case 11:
-                    logout();
+                case 3:
+                    editarEvento(sc);
                     break;
+                case 4:
+                    deletarEvento(sc);
+                    break;
+                case 12:
+                    logout();
+                    return;
                 default:
                     System.out.println("Opção inválida!");
             }
-        } while (opcao != 11);
+        } while (true);
 
+    }
+
+    public static void visualizarEventos() {
+        try {
+            String listaFormatada = new EventoDAO().listarEventosFormatados();
+            System.out.println(listaFormatada);
+        } catch (SQLException e) {
+            System.err.println("Erro ao listar eventos: " + e.getMessage());
+        }
     }
 
     public static void criarEvento(Scanner sc) {
@@ -255,15 +274,72 @@ public class Main {
         }
     }
 
-    public static void visualizarEventos() {
+    public static void editarEvento(Scanner sc) {
+
+        System.out.println("\n--- Editar Evento ---");
+        System.out.println("Digite as informações do evento:");
+
+        sc.nextLine();
+
+        System.out.print("ID do Evento que deseja editar: ");
+        int id = sc.nextInt();
+        sc.nextLine();
+
+        System.out.print("Qual o novo nome do evento: ");
+        String nome = sc.nextLine();
+
+        System.out.print("Descrição: ");
+        String descricao = sc.nextLine();
+
+        System.out.print("Data Início (YYYY-MM-DD): ");
+        String dataInicio = sc.nextLine();
+
+        System.out.print("Data Fim (YYYY-MM-DD): ");
+        String dataFim = sc.nextLine();
+
         try {
-            String listaFormatada = new EventoDAO().listarEventosFormatados();
-            System.out.println(listaFormatada);
+            Evento evento = new Evento(nome, descricao, dataInicio, dataFim, id);
+            new EventoDAO().editarEvento(evento);
+            System.out.println("Evento editado com sucesso!");
         } catch (SQLException e) {
-            System.err.println("Erro ao listar eventos: " + e.getMessage());
+            System.err.println("Erro ao editar evento: " + e.getMessage());
+        }
+    }
+
+    public static void deletarEvento(Scanner sc) {
+
+        System.out.println("\n--- Deletar Evento ---");
+
+        sc.nextLine();
+
+        System.out.println("Digite o ID do evento que deseja deletar: ");
+        int id = sc.nextInt();
+
+        do {
+
+            System.out.println("Tem certeza que deseja deletar o evento? (S/N)");
+            String opcao = sc.next();
+
+            if (opcao.equalsIgnoreCase("S")) {
+                break;
+            }
+
+            if (opcao.equalsIgnoreCase("N")) {
+                System.out.println("Operação cancelada!");
+                return;
+            }
+
+        } while (true);
+
+        sc.nextLine();
+
+        try {
+            new EventoDAO().deletarEvento(id);
+            System.out.println("Evento deletado com sucesso!");
+        } catch (SQLException e) {
+            System.err.println("Erro ao deletar evento: " + e.getMessage());
         }
 
-        menuAdmin();
     }
 
     public static void menuParticipante() {
@@ -289,7 +365,7 @@ public class Main {
 
             switch (opcao) {
                 case 1:
-                    // Visualizar Eventos
+                    visualizarEventos();
                     break;
                 case 2:
                     // Inscrever-se em Eventos

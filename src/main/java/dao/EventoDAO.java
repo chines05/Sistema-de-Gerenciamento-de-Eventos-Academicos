@@ -103,11 +103,10 @@ public class EventoDAO {
         return sb.toString();
     }
 
-    public void atualizarEvento(Evento evento) throws SQLException {
+    public void editarEvento(Evento evento) throws SQLException {
         String sql = """
             UPDATE Evento 
-            SET nome = ?, descricao = ?, data_inicio = ?, data_fim = ?, 
-                vagas_total = ?, vagas_disponivel = ?
+            SET nome = ?, descricao = ?, data_inicio = ?, data_fim = ?
             WHERE id = ?
             """;
 
@@ -118,9 +117,7 @@ public class EventoDAO {
             stmt.setString(2, evento.getDescricao());
             stmt.setString(3, evento.getDataInicio());
             stmt.setString(4, evento.getDataFim());
-            stmt.setInt(5, evento.getVagasTotal());
-            stmt.setInt(6, evento.getVagasDisponiveis());
-            stmt.setInt(7, evento.getId());
+            stmt.setInt(5, evento.getId());
 
             stmt.executeUpdate();
         }

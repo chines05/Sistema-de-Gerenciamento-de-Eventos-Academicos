@@ -20,6 +20,14 @@ public class Evento {
         this.vagasDisponivel = vagasDisponivel;
     }
 
+    public Evento(String nome, String descricao, String dataInicio, String dataFim, int id) {
+        this.id = id;
+        this.nome = nome;
+        this.descricao = descricao;
+        this.dataInicio = dataInicio;
+        this.dataFim = dataFim;
+    }
+
     public int getId() {
         return this.id;
     }
