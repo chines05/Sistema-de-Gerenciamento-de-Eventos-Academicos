@@ -35,8 +35,8 @@ public class ConnectionFactory {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nome TEXT NOT NULL,
             descricao TEXT,
-            data_inicio TEXT NOT NULL,
-            data_fim TEXT NOT NULL,
+            data_inicio DATETIME NOT NULL,
+            data_fim DATETIME NOT NULL,
             vagas_total INTEGER,
             vagas_disponivel INTEGER
         );
@@ -55,11 +55,66 @@ public class ConnectionFactory {
         );
         """;
 
+        String sqlAtividade = """
+        CREATE TABLE IF NOT EXISTS Atividade (    
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            evento_id INTEGER NOT NULL,
+            nome TEXT NOT NULL,
+            descricao TEXT,
+            data_realizacao DATETIME NOT NULL,
+            hora_inicio TIME NOT NULL,
+            hora_fim TIME NOT NULL,
+            limite_inscritos INTEGER,
+            vagas_disponiveis INTEGER,
+            tipo TEXT CHECK(tipo IN ('PALESTRA', 'SIMPOSIO', 'CURSO')),
+            FOREIGN KEY (evento_id) REFERENCES Evento(id)
+        );
+        """;
+
+        String sqlConfigInscricao = """
+        CREATE TABLE IF NOT EXISTS config_inscricao (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            role TEXT NOT NULL UNIQUE CHECK(role IN ('ALUNO', 'PROFESSOR', 'PROFISSIONAL')),
+            valor REAL NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
+        """;
+
+        String sqlInsertValores = """
+        INSERT OR IGNORE INTO config_inscricao (role, valor) VALUES 
+            ('ALUNO', 10.0),
+            ('PROFESSOR', 50.0),
+            ('PROFISSIONAL', 100.0);
+        """;
+
+        String deleteUsers = """
+        DROP TABLE IF EXISTS User;
+        """;
+
+        String deleteEventos = """
+        DROP TABLE IF EXISTS Evento;
+        """;
+
+        String deleteEvento_user = """
+        DROP TABLE IF EXISTS evento_user;
+        """;
+
+        String deleteAtividade = """
+        DROP TABLE IF EXISTS Atividade;
+        """;
+
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement()) {
+
             stmt.execute(sqlUsuarios);
             stmt.execute(sqlEventos);
             stmt.execute(sqlEvento_user);
+            stmt.execute(sqlAtividade);
+
+            stmt.execute(sqlConfigInscricao);
+            stmt.execute(sqlInsertValores);
+
             System.out.println("Tabelas criadas com sucesso!");
         } catch (SQLException e) {
             System.err.println("Erro ao criar tabelas: " + e.getMessage());

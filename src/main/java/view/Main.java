@@ -1,9 +1,9 @@
 package view;
 
+import dao.ConfigInscricaoDAO;
 import dao.EventoDAO;
-import exceptions.EmailDuplicadoException;
-import exceptions.EmailInvalidoException;
-import exceptions.SenhaFracaException;
+import dao.InscricaoEventoDAO;
+import exceptions.*;
 import model.Admin;
 import dao.UserDAO;
 import model.Evento;
@@ -11,19 +11,19 @@ import model.Participante;
 import model.User;
 import utils.ConnectionFactory;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
 
-//        criarTabelas();
-        //visualizarEventos();
-
+        criarTabelas();
         menuLogin();
-
+        //cadastrar();
     }
 
     public static void criarTabelas() {
@@ -65,7 +65,6 @@ public class Main {
     }
 
     public static void login() {
-
         Scanner sc = new Scanner(System.in);
 
         System.out.println("\nFaça seu login");
@@ -92,7 +91,7 @@ public class Main {
                 } else if (usuario instanceof Participante) {
                     Participante participante = (Participante) usuario;
                     System.out.println("Você está logado como: " + participante.getRole());
-                    menuParticipante();
+                    menuParticipante(participante);
 
                     return;
                 }
@@ -194,18 +193,49 @@ public class Main {
         int opcao;
         do {
             System.out.println("\nEscolha uma opção:");
-            System.out.println("1 - Visualizar Eventos");
-            System.out.println("2 - Criar Evento");
-            System.out.println("3 - Editar Evento");
-            System.out.println("4 - Excluir Evento");
-            System.out.println("5 - Cadastrar Atividade");
-            System.out.println("6 - Definir Limite de Vagas");
-            System.out.println("7 - Confirmar Pagamentos");
-            System.out.println("8 - Visualizar Inscritos");
+            System.out.println("1 - Menu de Evento");
+            System.out.println("2 - Cadastrar Atividade");
+            System.out.println("3 - Menu valores Inscricoes");
             System.out.println("9 - Definir Taxas");
             System.out.println("10 - Relatórios Participação");
             System.out.println("11 - Relatórios Financeiros");
             System.out.println("12 - Sair");
+
+            System.out.print("Opção: ");
+
+            opcao = sc.nextInt();
+
+            switch (opcao) {
+                case 1:
+                    menuEvento();
+                    break;
+                case 3:
+                    menuValoresInscricoes();
+                case 12:
+                    logout();
+                    return;
+                default:
+                    System.out.println("Opção inválida!");
+            }
+
+        } while (true);
+
+    }
+
+    public static void menuEvento() {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("\n--- Menu do Evento ---");
+
+        int opcao;
+        do {
+            System.out.println("\nEscolha uma opção:");
+            System.out.println("1 - Visualizar Eventos");
+            System.out.println("2 - Criar Evento");
+            System.out.println("3 - Editar Evento");
+            System.out.println("4 - Excluir Evento");
+            System.out.println("5 - Menu confirmar/cancelar inscricoes");
+            System.out.println("6 - Sair");
 
             System.out.print("Opção: ");
 
@@ -224,12 +254,15 @@ public class Main {
                 case 4:
                     deletarEvento(sc);
                     break;
-                case 12:
-                    logout();
+                case 5:
+                    menuConfirmarInscricoes();
+                    break;
+                case 6:
                     return;
                 default:
                     System.out.println("Opção inválida!");
             }
+
         } while (true);
 
     }
@@ -339,10 +372,125 @@ public class Main {
         } catch (SQLException e) {
             System.err.println("Erro ao deletar evento: " + e.getMessage());
         }
+    }
+
+    public static void menuConfirmarInscricoes() {
+        Scanner sc = new Scanner(System.in);
+        InscricaoEventoDAO inscricaoDAO = new InscricaoEventoDAO();
+
+        try {
+            String inscricoes = inscricaoDAO.listarInscricoesPendentes();
+            System.out.println(inscricoes);
+
+            if (inscricoes.equals("\nNão há inscrições pendentes de confirmação.")) {
+                return;
+            }
+
+            System.out.print("\nDigite o ID da inscrição para gerenciar ou 0 para voltar: ");
+            int id = sc.nextInt();
+            sc.nextLine();
+
+            if (id > 0) {
+                System.out.println("\nEscolha a ação:");
+                System.out.println("1 - Confirmar inscrição");
+                System.out.println("2 - Recusar inscrição");
+                System.out.println("3 - Manter pendente");
+                System.out.print("Opção: ");
+
+                int opcao = sc.nextInt();
+                sc.nextLine();
+
+                switch (opcao) {
+                    case 1:
+                        inscricaoDAO.atualizarStatusInscricao(id, "CONFIRMADO");
+                        System.out.println("Inscrição confirmada com sucesso!");
+                        break;
+                    case 2:
+                        inscricaoDAO.atualizarStatusInscricao(id, "RECUSADO");
+                        System.out.println("Inscrição recusada com sucesso!");
+                        break;
+                    case 3:
+                        System.out.println("Status mantido como pendente.");
+                        break;
+                    default:
+                        System.out.println("Opção inválida!");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro ao processar inscrições: " + e.getMessage());
+        }
+    }
+
+    public static void menuValoresInscricoes() {
+
+        System.out.println("\n--- Menu Valores Inscricoes ---");
+
+        int opcao;
+
+        do {
+
+            System.out.println("\nEscolha uma opção:");
+            System.out.println("1 - Visualizar Valores");
+            System.out.println("2 - Editar Valores");
+            System.out.println("3 - Sair");
+            System.out.print("Opção: ");
+            opcao = new Scanner(System.in).nextInt();
+
+            switch (opcao) {
+                case 1:
+                    visualizarValoresInscricoes();
+                    break;
+                case 2:
+                    editarValoresInscricoes();
+                    break;
+                case 3:
+                    System.out.println("Saindo...");
+                    return;
+                default:
+                    System.out.println("Opção inválida!");
+            }
+
+        } while (opcao != 3);
 
     }
 
-    public static void menuParticipante() {
+    public static void visualizarValoresInscricoes() {
+        try {
+            String valores = new ConfigInscricaoDAO().listarValoresFormatado();
+            System.out.println(valores);
+        } catch (SQLException e) {
+            System.err.println("Erro ao listar valores: " + e.getMessage());
+        }
+    }
+
+    public static void editarValoresInscricoes() {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("\n--- Editar Valores ---");
+
+        System.out.print("Digite o role do participante: ");
+        String role = sc.nextLine();
+
+        System.out.print("Digite o novo valor: ");
+        String novoValor = sc.nextLine();
+
+        sc.nextLine();
+
+        try {
+            new ConfigInscricaoDAO().atualizarValorInscricao(role, novoValor);
+            System.out.println("Valores editados com sucesso!");
+        } catch (SQLException e) {
+            System.err.println("Erro ao editar valores: " + e.getMessage());
+        } catch (ValorInvalidoException e) {
+            System.err.println("Erro ao editar valores: " + e.getMessage());
+        }
+    }
+
+    public static void menuParticipante(Participante participante) {
+        Scanner sc = new Scanner(System.in);
+
+        InscricaoEventoDAO inscricaoDAO = new InscricaoEventoDAO();
+
         System.out.println("Bem-vindo ao menu do participante!");
 
         int opcao;
@@ -361,14 +509,14 @@ public class Main {
             System.out.println("11 - Sair");
             System.out.print("Opção: ");
 
-            opcao = new Scanner(System.in).nextInt();
+            opcao = sc.nextInt();
 
             switch (opcao) {
                 case 1:
                     visualizarEventos();
                     break;
                 case 2:
-                    // Inscrever-se em Eventos
+                    inscreverEmEvento(sc, participante.getId(), inscricaoDAO, participante.getRole());
                     break;
                 case 3:
                     // Visualizar Atividades
@@ -402,6 +550,33 @@ public class Main {
             }
 
         } while (opcao != 11);
+    }
+
+    public static void valorInscricaoUser(String role) {
+        try {
+            String valores = String.valueOf(new ConfigInscricaoDAO().getValorInscricao(role));
+            System.out.println("Valor da inscrição: " + valores);
+        } catch (SQLException e) {
+            System.err.println("Erro ao listar valores: " + e.getMessage());
+        }
+    }
+
+    private static void inscreverEmEvento(Scanner sc, int usuarioId, InscricaoEventoDAO inscricaoDAO, String role) {
+        System.out.println("\n--- Inscrever-se em Evento ---");
+        visualizarEventos();
+
+        valorInscricaoUser(role);
+
+        System.out.print("\nDigite o ID do evento que deseja se inscrever: ");
+        int eventoId = sc.nextInt();
+
+        try {
+            inscricaoDAO.inscreverUsuario(usuarioId, eventoId);
+            System.out.println("Inscrição realizada com sucesso!");
+        } catch (SQLException | VagasEsgotadasException | UsuarioJaInscritoException e) {
+            System.err.println("Erro ao inscrever-se no evento: " + e.getMessage());
+            pause(1000);
+        }
     }
 
 }
