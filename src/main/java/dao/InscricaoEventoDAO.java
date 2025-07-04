@@ -1,5 +1,6 @@
 package dao;
 
+import exceptions.InscricaoNaoPermitidaException;
 import exceptions.InscricaoPendenteException;
 import exceptions.VagasEsgotadasException;
 import exceptions.UsuarioJaInscritoException;
@@ -9,7 +10,7 @@ import java.sql.*;
 public class InscricaoEventoDAO {
 
     public void inscreverUsuario(int usuarioId, int eventoId)
-            throws SQLException, VagasEsgotadasException, UsuarioJaInscritoException, InscricaoPendenteException {
+            throws SQLException, VagasEsgotadasException, UsuarioJaInscritoException, InscricaoPendenteException, InscricaoNaoPermitidaException {
 
         EventoDAO eventoDAO = new EventoDAO();
 
@@ -23,6 +24,14 @@ public class InscricaoEventoDAO {
 
         if (usuarioJaInscrito(usuarioId, eventoId)) {
             throw new UsuarioJaInscritoException("Você já está inscrito neste evento!");
+        }
+
+        if (usuarioJaRecusado(usuarioId, eventoId)) {
+            throw new InscricaoNaoPermitidaException("Você já teve sua inscrição recusada para este evento!");
+        }
+
+        if (usuarioJaPedente(usuarioId, eventoId)) {
+            throw new InscricaoNaoPermitidaException("Sua inscrição para este evento ainda está pendente!");
         }
 
         String sql = "INSERT INTO evento_user (usuario_id, evento_id, status_pagamento) VALUES (?, ?, 'PENDENTE')";
@@ -46,9 +55,6 @@ public class InscricaoEventoDAO {
         String atualizaVagas = "";
         if (status.equals("CONFIRMADO")) {
             atualizaVagas = "UPDATE Evento SET vagas_disponivel = vagas_disponivel - 1 WHERE id = " +
-                    "(SELECT evento_id FROM evento_user WHERE id = ?)";
-        } else if (status.equals("RECUSADO")) {
-            atualizaVagas = "UPDATE Evento SET vagas_disponivel = vagas_disponivel + 1 WHERE id = " +
                     "(SELECT evento_id FROM evento_user WHERE id = ?)";
         }
 
@@ -151,6 +157,30 @@ public class InscricaoEventoDAO {
             stmt.setInt(1, usuarioId);
             stmt.setInt(2, eventoId);
 
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
+        }
+    }
+
+    public boolean usuarioJaRecusado(int usuarioId, int eventoId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM evento_user WHERE usuario_id = ? AND evento_id = ? AND status_pagamento = 'RECUSADO'";
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, usuarioId);
+            stmt.setInt(2, eventoId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
+        }
+    }
+
+    public boolean usuarioJaPedente(int usuarioId, int eventoId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM evento_user WHERE usuario_id = ? AND evento_id = ? AND status_pagamento = 'PENDENTE'";
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, usuarioId);
+            stmt.setInt(2, eventoId);
             try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next() && rs.getInt(1) > 0;
             }

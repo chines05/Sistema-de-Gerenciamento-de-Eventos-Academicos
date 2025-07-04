@@ -38,7 +38,7 @@ public class Main {
 
     public static void bemVindo() {
 
-        System.out.println("Bem-vindo ao  de Gerenciamento de Eventos Acadêmicos!");
+        System.out.println("Bem-vindo ao Sistema de Gerenciamento de Eventos Acadêmicos!");
 
     }
 
@@ -211,10 +211,7 @@ public class Main {
             System.out.println("1 - Menu de Evento");
             System.out.println("2 - Cadastrar Atividade");
             System.out.println("3 - Menu valores Inscricoes");
-            System.out.println("9 - Definir Taxas");
-            System.out.println("10 - Relatórios Participação");
-            System.out.println("11 - Relatórios Financeiros");
-            System.out.println("12 - Sair");
+            System.out.println("4 - Sair");
 
             System.out.print("Opção: ");
 
@@ -227,7 +224,7 @@ public class Main {
                 case 3:
                     menuValoresInscricoes();
                     break;
-                case 12:
+                case 4:
                     logout();
                     return;
                 default:
@@ -529,12 +526,10 @@ public class Main {
             System.out.println("5 - Inscrever-se em Atividade");
             System.out.println("6 - Visualizar atividades inscritas");
 
-            System.out.println("6 - Visualizar Informações da Atividade");
-            System.out.println("7 - Visualizar Eventos Inscritos");
+            System.out.println("7 - Visualizar Informações da Atividade");
             System.out.println("8 - Visualizar Atividades Inscritas");
             System.out.println("9 - Visualizar Informações do Pagamento");
-            System.out.println("10 - Cancelar Inscrição");
-            System.out.println("11 - Sair");
+            System.out.println("10 - Sair");
             System.out.print("Opção: ");
 
             opcao = sc.nextInt();
@@ -555,17 +550,17 @@ public class Main {
                 case 5:
                     // Visualizar Informações da Atividade
                     break;
-                case 10:
+                case 9:
                     // Visualizar Informações do Pagamento
                     break;
-                case 11:
+                case 10:
                     logout();
-                    break;
+                    return;
                 default:
                     System.out.println("Opção inválida!");
             }
 
-        } while (opcao != 11);
+        } while (true);
 
     }
 
@@ -600,6 +595,8 @@ public class Main {
             System.err.println("Erro: " + e.getMessage());
         } catch (VagasEsgotadasException e) {
             System.err.println("Erro: " + e.getMessage());
+        } catch (InscricaoNaoPermitidaException e) {
+            System.out.println("Erro: " + e.getMessage());
         } catch (SQLException e) {
             System.err.println("Erro no banco de dados: " + e.getMessage());
         }
