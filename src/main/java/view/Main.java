@@ -38,7 +38,7 @@ public class Main {
 
     public static void bemVindo() {
 
-        System.out.println("Bem-vindo ao Sistema de Gerenciamento de Eventos Acadêmicos!");
+        System.out.println("Bem-vindo ao  de Gerenciamento de Eventos Acadêmicos!");
 
     }
 
