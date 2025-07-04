@@ -11,27 +11,35 @@ import model.Participante;
 import model.User;
 import utils.ConnectionFactory;
 
-import java.io.IOException;
+import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
+
+    private static ConnectionFactory connectionFactory = new ConnectionFactory();
+
     public static void main(String[] args) {
 
-        criarTabelas();
+//        criarTabelas();
         menuLogin();
-        //cadastrar();
+//        cadastrar();
     }
 
     public static void criarTabelas() {
+
         ConnectionFactory.criarTabelas();
+
+    }
+
+    public static void closeConnection() {
+        ConnectionFactory.closeConnection((Connection) connectionFactory);
     }
 
     public static void bemVindo() {
+
         System.out.println("Bem-vindo ao Sistema de Gerenciamento de Eventos Acadêmicos!");
+
     }
 
     public static void menuLogin() {
@@ -65,6 +73,7 @@ public class Main {
     }
 
     public static void login() {
+
         Scanner sc = new Scanner(System.in);
 
         System.out.println("\nFaça seu login");
@@ -111,6 +120,7 @@ public class Main {
     }
 
     public static void cadastrar() {
+
         Scanner sc = new Scanner(System.in);
 
         System.out.println("\nCadastrar-se");
@@ -152,15 +162,18 @@ public class Main {
 
     }
 
-    private static void pause(int millis) {
+    public static void pause(int millis) {
+
         try {
             Thread.sleep(millis);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+
     }
 
-    private static String selecionarRole(Scanner sc) {
+    public static String selecionarRole(Scanner sc) {
+
         while (true) {
             System.out.println("\nTipo de conta:");
             System.out.println("1 - Aluno");
@@ -183,12 +196,14 @@ public class Main {
             }
             pause(1000);
         }
+
     }
 
     public static void menuAdmin() {
+
         Scanner sc = new Scanner(System.in);
 
-        System.out.println("Bem-vindo ao menu do admin!");
+        System.out.println("--- Menu do Admin ---");
 
         int opcao;
         do {
@@ -211,6 +226,7 @@ public class Main {
                     break;
                 case 3:
                     menuValoresInscricoes();
+                    break;
                 case 12:
                     logout();
                     return;
@@ -223,6 +239,7 @@ public class Main {
     }
 
     public static void menuEvento() {
+
         Scanner sc = new Scanner(System.in);
 
         System.out.println("\n--- Menu do Evento ---");
@@ -268,12 +285,14 @@ public class Main {
     }
 
     public static void visualizarEventos() {
+
         try {
             String listaFormatada = new EventoDAO().listarEventosFormatados();
             System.out.println(listaFormatada);
         } catch (SQLException e) {
             System.err.println("Erro ao listar eventos: " + e.getMessage());
         }
+
     }
 
     public static void criarEvento(Scanner sc) {
@@ -305,6 +324,7 @@ public class Main {
         } catch (SQLException e) {
             System.err.println("Erro ao criar evento: " + e.getMessage());
         }
+
     }
 
     public static void editarEvento(Scanner sc) {
@@ -337,6 +357,7 @@ public class Main {
         } catch (SQLException e) {
             System.err.println("Erro ao editar evento: " + e.getMessage());
         }
+
     }
 
     public static void deletarEvento(Scanner sc) {
@@ -349,7 +370,6 @@ public class Main {
         int id = sc.nextInt();
 
         do {
-
             System.out.println("Tem certeza que deseja deletar o evento? (S/N)");
             String opcao = sc.next();
 
@@ -372,9 +392,11 @@ public class Main {
         } catch (SQLException e) {
             System.err.println("Erro ao deletar evento: " + e.getMessage());
         }
+
     }
 
     public static void menuConfirmarInscricoes() {
+
         Scanner sc = new Scanner(System.in);
         InscricaoEventoDAO inscricaoDAO = new InscricaoEventoDAO();
 
@@ -419,6 +441,7 @@ public class Main {
         } catch (SQLException e) {
             System.err.println("Erro ao processar inscrições: " + e.getMessage());
         }
+
     }
 
     public static void menuValoresInscricoes() {
@@ -428,7 +451,6 @@ public class Main {
         int opcao;
 
         do {
-
             System.out.println("\nEscolha uma opção:");
             System.out.println("1 - Visualizar Valores");
             System.out.println("2 - Editar Valores");
@@ -444,26 +466,27 @@ public class Main {
                     editarValoresInscricoes();
                     break;
                 case 3:
-                    System.out.println("Saindo...");
                     return;
                 default:
                     System.out.println("Opção inválida!");
             }
-
         } while (opcao != 3);
 
     }
 
     public static void visualizarValoresInscricoes() {
+
         try {
             String valores = new ConfigInscricaoDAO().listarValoresFormatado();
             System.out.println(valores);
         } catch (SQLException e) {
             System.err.println("Erro ao listar valores: " + e.getMessage());
         }
+
     }
 
     public static void editarValoresInscricoes() {
+
         Scanner sc = new Scanner(System.in);
 
         System.out.println("\n--- Editar Valores ---");
@@ -484,23 +507,28 @@ public class Main {
         } catch (ValorInvalidoException e) {
             System.err.println("Erro ao editar valores: " + e.getMessage());
         }
+
     }
 
     public static void menuParticipante(Participante participante) {
+
         Scanner sc = new Scanner(System.in);
 
         InscricaoEventoDAO inscricaoDAO = new InscricaoEventoDAO();
 
-        System.out.println("Bem-vindo ao menu do participante!");
+        System.out.println("--- Menu do Participante ---");
 
         int opcao;
         do {
             System.out.println("\nEscolha uma opção:");
-            System.out.println("1 - Visualizar Eventos");
-            System.out.println("2 - Inscrever-se em Evento");
-            System.out.println("3 - Visualizar Atividades");
-            System.out.println("4 - Inscrever-se em Atividade");
-            System.out.println("5 - Visualizar Informações do Evento");
+            System.out.println("1 - Visualizar todos os eventos");
+            System.out.println("2 - Se inscrever em um evento");
+            System.out.println("3 - Visualizar eventos inscritos");
+
+            System.out.println("4 - Visualizar atividades do evento");
+            System.out.println("5 - Inscrever-se em Atividade");
+            System.out.println("6 - Visualizar atividades inscritas");
+
             System.out.println("6 - Visualizar Informações da Atividade");
             System.out.println("7 - Visualizar Eventos Inscritos");
             System.out.println("8 - Visualizar Atividades Inscritas");
@@ -519,25 +547,13 @@ public class Main {
                     inscreverEmEvento(sc, participante.getId(), inscricaoDAO, participante.getRole());
                     break;
                 case 3:
-                    // Visualizar Atividades
+                    visualizarEventosInscritos(participante.getId());
                     break;
                 case 4:
                     // Visualizar Informações do Evento
                     break;
                 case 5:
                     // Visualizar Informações da Atividade
-                    break;
-                case 6:
-                    // Visualizar Informações do Participante
-                    break;
-                case 7:
-                    // Visualizar Informações do Aluno
-                    break;
-                case 8:
-                    // Visualizar Informações do Professor
-                    break;
-                case 9:
-                    // Visualizar Informações do Profissional
                     break;
                 case 10:
                     // Visualizar Informações do Pagamento
@@ -550,18 +566,22 @@ public class Main {
             }
 
         } while (opcao != 11);
+
     }
 
     public static void valorInscricaoUser(String role) {
+
         try {
             String valores = String.valueOf(new ConfigInscricaoDAO().getValorInscricao(role));
             System.out.println("Valor da inscrição: " + valores);
         } catch (SQLException e) {
             System.err.println("Erro ao listar valores: " + e.getMessage());
         }
+
     }
 
-    private static void inscreverEmEvento(Scanner sc, int usuarioId, InscricaoEventoDAO inscricaoDAO, String role) {
+    public static void inscreverEmEvento(Scanner sc, int usuarioId, InscricaoEventoDAO inscricaoDAO, String role) {
+
         System.out.println("\n--- Inscrever-se em Evento ---");
         visualizarEventos();
 
@@ -572,11 +592,29 @@ public class Main {
 
         try {
             inscricaoDAO.inscreverUsuario(usuarioId, eventoId);
-            System.out.println("Inscrição realizada com sucesso!");
-        } catch (SQLException | VagasEsgotadasException | UsuarioJaInscritoException e) {
-            System.err.println("Erro ao inscrever-se no evento: " + e.getMessage());
-            pause(1000);
+            System.out.println("Inscrição realizada com sucesso! Aguarde confirmação.");
+        } catch (InscricaoPendenteException e) {
+            System.err.println("Erro: " + e.getMessage());
+            System.out.println("Você já tem uma inscrição pendente para este evento.");
+        } catch (UsuarioJaInscritoException e) {
+            System.err.println("Erro: " + e.getMessage());
+        } catch (VagasEsgotadasException e) {
+            System.err.println("Erro: " + e.getMessage());
+        } catch (SQLException e) {
+            System.err.println("Erro no banco de dados: " + e.getMessage());
         }
+
+    }
+
+    public static void visualizarEventosInscritos(int usuarioId) {
+
+        try {
+            String eventosInscritos = new InscricaoEventoDAO().listarEventosConfirmadosDoUsuario(usuarioId);
+            System.out.println(eventosInscritos);
+        } catch (SQLException e) {
+            System.err.println("Erro ao listar eventos inscritos: " + e.getMessage());
+        }
+
     }
 
 }

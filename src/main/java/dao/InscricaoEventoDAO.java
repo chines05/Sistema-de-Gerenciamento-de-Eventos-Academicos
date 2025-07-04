@@ -1,29 +1,31 @@
 package dao;
 
+import exceptions.InscricaoPendenteException;
 import exceptions.VagasEsgotadasException;
 import exceptions.UsuarioJaInscritoException;
 import utils.ConnectionFactory;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class InscricaoEventoDAO {
 
     public void inscreverUsuario(int usuarioId, int eventoId)
-            throws SQLException, VagasEsgotadasException, UsuarioJaInscritoException {
+            throws SQLException, VagasEsgotadasException, UsuarioJaInscritoException, InscricaoPendenteException {
 
         EventoDAO eventoDAO = new EventoDAO();
+
         if (!eventoDAO.temVagasDisponiveis(eventoId)) {
             throw new VagasEsgotadasException("Não há vagas disponíveis para este evento!");
         }
 
-        if (usuarioJaInscrito(usuarioId, eventoId)) {
-            throw new UsuarioJaInscritoException("Usuário já está inscrito neste evento!");
+        if (usuarioTemInscricaoPendente(usuarioId, eventoId)) {
+            throw new InscricaoPendenteException("Você já tem uma inscrição pendente para este evento!");
         }
 
-        String sql = "INSERT INTO evento_user (usuario_id, evento_id) VALUES (?, ?)";
+        if (usuarioJaInscrito(usuarioId, eventoId)) {
+            throw new UsuarioJaInscritoException("Você já está inscrito neste evento!");
+        }
+
+        String sql = "INSERT INTO evento_user (usuario_id, evento_id, status_pagamento) VALUES (?, ?, 'PENDENTE')";
 
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -41,7 +43,6 @@ public class InscricaoEventoDAO {
 
         String sql = "UPDATE evento_user SET status_pagamento = ? WHERE id = ?";
 
-        // Só atualiza vagas se for CONFIRMADO (incrementa) ou RECUSADO (decrementa)
         String atualizaVagas = "";
         if (status.equals("CONFIRMADO")) {
             atualizaVagas = "UPDATE Evento SET vagas_disponivel = vagas_disponivel - 1 WHERE id = " +
@@ -119,7 +120,30 @@ public class InscricaoEventoDAO {
     }
 
     private boolean usuarioJaInscrito(int usuarioId, int eventoId) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM evento_user WHERE usuario_id = ? AND evento_id = ?";
+        String sql = """
+        SELECT COUNT(*) FROM evento_user 
+        WHERE usuario_id = ? AND evento_id = ? 
+        AND status_pagamento IN ('PENDENTE', 'CONFIRMADO')
+        """;
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, usuarioId);
+            stmt.setInt(2, eventoId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
+        }
+    }
+
+    public boolean usuarioTemInscricaoPendente(int usuarioId, int eventoId) throws SQLException {
+        String sql = """
+        SELECT COUNT(*) FROM evento_user 
+        WHERE usuario_id = ? AND evento_id = ? 
+        AND status_pagamento = 'PENDENTE'
+        """;
 
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -165,4 +189,46 @@ public class InscricaoEventoDAO {
             if (conn != null) conn.setAutoCommit(true);
         }
     }
+
+    public String listarEventosConfirmadosDoUsuario(int usuarioId) throws SQLException {
+        String sql = """
+        SELECT e.id, e.nome, e.descricao, e.data_inicio, e.data_fim, 
+               e.vagas_total, e.vagas_disponivel, eu.data_inscricao
+        FROM evento_user eu
+        JOIN Evento e ON eu.evento_id = e.id
+        WHERE eu.usuario_id = ? AND eu.status_pagamento = 'CONFIRMADO'
+        ORDER BY e.data_inicio
+        """;
+
+        StringBuilder sb = new StringBuilder();
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, usuarioId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (!rs.isBeforeFirst()) {
+                return "\nVocê não está inscrito em nenhum evento confirmado.";
+            }
+
+            sb.append("\n--- SEUS EVENTOS CONFIRMADOS ---\n");
+            sb.append(String.format("%-5s %-30s %-15s %-15s %-10s %-20s%n",
+                    "ID", "Evento", "Data Início", "Data Fim", "Vagas", "Data Inscrição"));
+            sb.append("-------------------------------------------------------------------------------------------\n");
+
+            while (rs.next()) {
+                sb.append(String.format("%-5d %-30s %-15s %-15s %-10d %-20s%n",
+                        rs.getInt("id"),
+                        rs.getString("nome"),
+                        rs.getString("data_inicio"),
+                        rs.getString("data_fim"),
+                        rs.getInt("vagas_total"),
+                        rs.getString("data_inscricao")));
+            }
+        }
+
+        return sb.toString();
+    }
+
 }

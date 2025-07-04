@@ -104,8 +104,13 @@ public class ConnectionFactory {
         DROP TABLE IF EXISTS Atividade;
         """;
 
-        try (Connection conn = getConnection();
-             Statement stmt = conn.createStatement()) {
+        String deleteConfigInscricao = """
+        DROP TABLE IF EXISTS config_inscricao;
+        """;
+
+        try  {
+            Connection conn = getConnection();
+            Statement stmt = conn.createStatement();
 
             stmt.execute(sqlUsuarios);
             stmt.execute(sqlEventos);
@@ -115,9 +120,27 @@ public class ConnectionFactory {
             stmt.execute(sqlConfigInscricao);
             stmt.execute(sqlInsertValores);
 
+//            stmt.execute(deleteUsers);
+//            stmt.execute(deleteEventos);
+//            stmt.execute(deleteEvento_user);
+//            stmt.execute(deleteAtividade);
+//            stmt.execute(deleteConfigInscricao);
+
             System.out.println("Tabelas criadas com sucesso!");
         } catch (SQLException e) {
             System.err.println("Erro ao criar tabelas: " + e.getMessage());
+        } finally {
+            closeConnection(null);
+        }
+    }
+
+    public static void closeConnection(Connection conn) {
+        try {
+            if (conn != null && !conn.isClosed()) {
+                conn.close();
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro ao fechar a conexão: " + e.getMessage());
         }
     }
 

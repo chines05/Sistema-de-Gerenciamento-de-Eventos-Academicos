@@ -1,7 +1,5 @@
 package model;
 
-import java.util.List;
-
 public class Participante extends User {
     //private double taxaInscricao;
     private String role;
