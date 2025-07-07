@@ -1,16 +1,17 @@
 package view;
 
+import dao.AtividadeDAO;
 import dao.ConfigInscricaoDAO;
 import dao.EventoDAO;
 import dao.InscricaoEventoDAO;
 import exceptions.*;
 import model.Admin;
+import model.Atividade;
 import dao.UserDAO;
 import model.Evento;
 import model.Participante;
 import model.User;
 import utils.ConnectionFactory;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Scanner;
@@ -28,7 +29,7 @@ public class Main {
 
     public static void criarTabelas() {
 
-        connectionFactory.criarTabelas();
+        ConnectionFactory.criarTabelas();
 
     }
 
@@ -209,7 +210,7 @@ public class Main {
         do {
             System.out.println("\nEscolha uma opção:");
             System.out.println("1 - Menu de Evento");
-            System.out.println("2 - Cadastrar Atividade");
+            System.out.println("2 - Menu de Atividades");
             System.out.println("3 - Menu valores Inscricoes");
             System.out.println("4 - Sair");
 
@@ -220,6 +221,9 @@ public class Main {
             switch (opcao) {
                 case 1:
                     menuEvento();
+                    break;
+                case 2:
+                    menuAtividades(sc);
                     break;
                 case 3:
                     menuValoresInscricoes();
@@ -507,6 +511,123 @@ public class Main {
 
     }
 
+    public static void menuAtividades(Scanner sc) {
+
+        System.out.println("\n--- Menu de Atividades ---");
+
+        int opcao;
+
+        do {
+            System.out.println("\nEscolha uma opção:");
+            System.out.println("1 - Criar Atividade");
+            System.out.println("2 - Listar Atividades");
+            System.out.println("3 - Sair");
+            System.out.print("Opção: ");
+            opcao = sc.nextInt();
+
+            switch (opcao) {
+                case 1:
+                    criarAtividade(sc);
+                    break;
+                case 2:
+                    listarAtividades(sc);
+                    break;
+                case 3:
+                    return;
+                default:
+                    System.out.println("Opção inválida!");
+            }
+        } while (opcao != 3);
+    }
+
+    public static void criarAtividade(Scanner sc) {
+
+        visualizarEventos();
+        
+        System.out.println("Digite o ID do evento aonde deseja criar a atividade: ");
+        int eventoID = sc.nextInt();
+        sc.nextLine();
+        
+        System.out.println("\n--- Criar Atividade ---");
+
+        System.out.print("Digite o nome da atividade: ");
+        String nome = sc.nextLine();
+
+        System.out.print("Digite a descrição da atividade: ");
+        String descricao = sc.nextLine();
+
+        System.out.print("Digite a data de realização da atividade: ");
+        String dataRealizacao = sc.nextLine();
+
+        System.out.print("Digite a hora de inicio da atividade: ");
+        String horaInicio = sc.nextLine();
+
+        System.out.print("Digite a hora de fim da atividade: ");
+        String horaFim = sc.nextLine();
+
+        System.out.print("Digite o limite de inscritos da atividade: ");
+        int limiteInscritos = sc.nextInt();
+        sc.nextLine();
+
+        String tipo = tipoAtividade(sc);
+
+        try {
+            Atividade atividade = new Atividade(nome, descricao, dataRealizacao, horaInicio, horaFim, limiteInscritos, limiteInscritos, tipo);
+            new AtividadeDAO().criarAtividade(atividade, eventoID);
+            System.out.println("Atividade criada com sucesso!");
+        } catch (SQLException e) {
+            System.err.println("Erro ao criar atividade: " + e.getMessage());
+        }
+
+    }
+
+    public static String tipoAtividade(Scanner sc) {
+        System.out.print("Qual o tipo da atividade: ");
+        
+        int opcao;
+        String tipo = "";
+
+        do {
+            System.out.println("\nEscolha uma opção:");
+            System.out.println("1 - PALESTRA");
+            System.out.println("2 - SIMPOSIO");
+            System.out.println("3 - CURSO");
+            System.out.println("4 - Sair");
+            System.out.print("Opção: ");
+            opcao = sc.nextInt();
+
+            switch (opcao) {
+                case 1:
+                    return tipo = "PALESTRA";
+                case 2:
+                    return tipo = "SIMPOSIO";
+                case 3:
+                    return tipo = "CURSO";
+                default:
+                    System.out.println("Opção inválida!");
+            }
+        } while (opcao != 4);
+
+        return tipo;
+    }
+
+    public static void listarAtividades(Scanner sc) {
+
+        visualizarEventos();
+
+        System.out.println("Digite o ID do evento aonde deseja listar as atividades: ");
+        int eventoID = sc.nextInt();
+        sc.nextLine();
+
+        try {
+            String atividades = new AtividadeDAO().listarAtividadesFormatadas(eventoID);
+            System.out.println(atividades);
+        } catch (SQLException e) {
+            System.err.println("Erro ao listar atividades: " + e.getMessage());
+        }
+
+    }
+
     public static void menuParticipante(Participante participante) {
 
         Scanner sc = new Scanner(System.in);
@@ -518,18 +639,19 @@ public class Main {
         int opcao;
         do {
             System.out.println("\nEscolha uma opção:");
+            System.out.println("-- Evento --");
             System.out.println("1 - Visualizar todos os eventos");
             System.out.println("2 - Se inscrever em um evento");
             System.out.println("3 - Visualizar eventos inscritos");
 
+            System.out.println("-- Atividade --");
             System.out.println("4 - Visualizar atividades do evento");
             System.out.println("5 - Inscrever-se em Atividade");
             System.out.println("6 - Visualizar atividades inscritas");
 
-            System.out.println("7 - Visualizar Informações da Atividade");
-            System.out.println("8 - Visualizar Atividades Inscritas");
-            System.out.println("9 - Visualizar Informações do Pagamento");
-            System.out.println("10 - Sair");
+            System.out.println("-- Pagamento --");
+            System.out.println("7 - Visualizar Informações do Pagamento");
+            System.out.println("8 - Sair");
             System.out.print("Opção: ");
 
             opcao = sc.nextInt();
@@ -545,15 +667,18 @@ public class Main {
                     visualizarEventosInscritos(participante.getId());
                     break;
                 case 4:
-                    // Visualizar Informações do Evento
+                    visualizarAtividadesDoEvento(sc, participante.getId());
                     break;
                 case 5:
-                    // Visualizar Informações da Atividade
+                    // inscreverEmAtividade(sc, participante.getId());
                     break;
-                case 9:
-                    // Visualizar Informações do Pagamento
+                case 6:
+                    visualizarAtividadeInscritas(sc, participante.getId());
                     break;
-                case 10:
+                case 7:
+                    visualizarInformacoesPagamento(participante.getId());
+                    break;
+                case 8:
                     logout();
                     return;
                 default:
@@ -575,7 +700,7 @@ public class Main {
 
     }
 
-    public static void inscreverEmEvento(Scanner sc, int usuarioId, InscricaoEventoDAO inscricaoDAO, String role) {
+    public static void inscreverEmEvento(Scanner sc, int userID, InscricaoEventoDAO inscricaoDAO, String role) {
 
         System.out.println("\n--- Inscrever-se em Evento ---");
         visualizarEventos();
@@ -583,10 +708,10 @@ public class Main {
         valorInscricaoUser(role);
 
         System.out.print("\nDigite o ID do evento que deseja se inscrever: ");
-        int eventoId = sc.nextInt();
+        int eventoID = sc.nextInt();
 
         try {
-            inscricaoDAO.inscreverUsuario(usuarioId, eventoId);
+            inscricaoDAO.inscreverUsuario(userID, eventoID);
             System.out.println("Inscrição realizada com sucesso! Aguarde confirmação.");
         } catch (InscricaoPendenteException e) {
             System.err.println("Erro: " + e.getMessage());
@@ -603,15 +728,46 @@ public class Main {
 
     }
 
-    public static void visualizarEventosInscritos(int usuarioId) {
+    public static void visualizarEventosInscritos(int userID) {
 
         try {
-            String eventosInscritos = new InscricaoEventoDAO().listarEventosConfirmadosDoUsuario(usuarioId);
+            String eventosInscritos = new InscricaoEventoDAO().listarEventosConfirmadosDoUsuario(userID);
             System.out.println(eventosInscritos);
         } catch (SQLException e) {
             System.err.println("Erro ao listar eventos inscritos: " + e.getMessage());
         }
 
     }
+
+    public static void visualizarAtividadesDoEvento(Scanner sc, int userID) {
+
+        visualizarEventos();
+
+        System.out.println("Digite o ID do evento aonde deseja listar as atividades: ");
+        int eventoID = sc.nextInt();
+        sc.nextLine();
+
+        try {
+            String atividades = new AtividadeDAO().listarAtividadesFormatadas(eventoID);
+            System.out.println(atividades);
+        } catch (SQLException e) {
+            System.err.println("Erro ao listar atividades: " + e.getMessage());
+        }
+
+    }
+
+    public static void visualizarAtividadeInscritas(Scanner sc, int userID) {
+
+    }
+
+    public static void visualizarInformacoesPagamento(int userID) {
+        try {
+            String informacoesPagamento = new InscricaoEventoDAO().listarTodasInscricoesDoUsuario(userID);
+            System.out.println(informacoesPagamento);
+        } catch (SQLException e) {
+            System.err.println("Erro ao listar informações de pagamento: " + e.getMessage());
+        }
+    }
+
 
 }

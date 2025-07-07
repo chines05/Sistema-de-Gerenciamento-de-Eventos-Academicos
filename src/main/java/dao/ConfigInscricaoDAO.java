@@ -33,7 +33,7 @@ public class ConfigInscricaoDAO implements ConfigInscricaoInterface {
 
         double novoValor;
         try {
-            String valorFormatado = valorInput.replace(",", ".");
+            String valorFormatado = valor.replace(",", ".");
             novoValor = Double.parseDouble(valorFormatado);
 
             if (novoValor <= 0) {

@@ -25,4 +25,6 @@ public interface InscricaoEventoInterface {
     public void cancelarInscricao(int usuarioId, int eventoId) throws SQLException;
 
     public String listarEventosConfirmadosDoUsuario(int usuarioId) throws SQLException;
+
+    public String listarTodasInscricoesDoUsuario(int userID) throws SQLException;
 }
