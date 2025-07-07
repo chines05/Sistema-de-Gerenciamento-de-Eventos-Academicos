@@ -1,11 +1,13 @@
 package dao;
 
 import exceptions.ValorInvalidoException;
+import interfaces.ConfigInscricaoInterface;
 import utils.ConnectionFactory;
 import java.sql.*;
 
-public class ConfigInscricaoDAO {
+public class ConfigInscricaoDAO implements ConfigInscricaoInterface {
 
+    @Override
     public double getValorInscricao(String role) throws SQLException {
         String sql = "SELECT valor FROM config_inscricao WHERE role = ?";
 
@@ -22,6 +24,7 @@ public class ConfigInscricaoDAO {
         }
     }
 
+    @Override
     public void atualizarValorInscricao(String role, String valorInput) throws SQLException, ValorInvalidoException {
         role = role.toUpperCase();
         if (!role.equals("ALUNO") && !role.equals("PROFESSOR") && !role.equals("PROFISSIONAL")) {
@@ -58,6 +61,7 @@ public class ConfigInscricaoDAO {
         }
     }
 
+    @Override
     public String listarValoresFormatado() throws SQLException {
         String sql = "SELECT role, valor FROM config_inscricao ORDER BY valor DESC";
 
