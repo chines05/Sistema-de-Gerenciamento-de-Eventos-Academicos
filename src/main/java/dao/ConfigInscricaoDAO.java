@@ -25,7 +25,7 @@ public class ConfigInscricaoDAO implements ConfigInscricaoInterface {
     }
 
     @Override
-    public void atualizarValorInscricao(String role, String valorInput) throws SQLException, ValorInvalidoException {
+    public void atualizarValorInscricao(String role, String valor) throws SQLException, ValorInvalidoException {
         role = role.toUpperCase();
         if (!role.equals("ALUNO") && !role.equals("PROFESSOR") && !role.equals("PROFISSIONAL")) {
             throw new IllegalArgumentException("Tipo de participante inválido: " + role);
