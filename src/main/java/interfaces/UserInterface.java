@@ -13,4 +13,5 @@ public interface UserInterface {
     public void createUser(Participante user) throws SQLException, EmailDuplicadoException, SenhaFracaException, EmailInvalidoException;
     
     public User login(String email, String senha) throws SQLException;
+
 }

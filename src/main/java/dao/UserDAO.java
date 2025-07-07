@@ -96,8 +96,7 @@ public class UserDAO implements UserInterface {
         return null;
     }
 
-    @Override
-    public boolean emailJaExistente(String email) throws SQLException {
+    private boolean emailJaExistente(String email) throws SQLException {
         String sql = "SELECT COUNT(*) FROM User WHERE email = ?";
 
         try (Connection conn = ConnectionFactory.getConnection();

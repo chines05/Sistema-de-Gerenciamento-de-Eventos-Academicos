@@ -9,7 +9,8 @@ import exceptions.VagasEsgotadasException;
 
 public interface InscricaoEventoInterface {
 
-    public void inscreverUsuario(int usuarioId, int eventoId) throws SQLException, VagasEsgotadasException, UsuarioJaInscritoException, InscricaoPendenteException, InscricaoNaoPermitidaException;
+    public void inscreverUsuario(int usuarioId, int eventoId) 
+        throws SQLException, VagasEsgotadasException, UsuarioJaInscritoException, InscricaoPendenteException, InscricaoNaoPermitidaException;
 
     public void atualizarStatusInscricao(int inscricaoId, String status) throws SQLException;
 
