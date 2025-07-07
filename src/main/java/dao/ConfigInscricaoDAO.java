@@ -22,7 +22,7 @@ public class ConfigInscricaoDAO {
         }
     }
 
-    public void atualizarValorInscricao(String role, String valorInput) throws SQLException, ValorInvalidoException {
+    public void atualizarValorInscricao(String role, String valor) throws SQLException, ValorInvalidoException {
         role = role.toUpperCase();
         if (!role.equals("ALUNO") && !role.equals("PROFESSOR") && !role.equals("PROFISSIONAL")) {
             throw new IllegalArgumentException("Tipo de participante inválido: " + role);
@@ -30,7 +30,7 @@ public class ConfigInscricaoDAO {
 
         double novoValor;
         try {
-            String valorFormatado = valorInput.replace(",", ".");
+            String valorFormatado = valor.replace(",", ".");
             novoValor = Double.parseDouble(valorFormatado);
 
             if (novoValor <= 0) {

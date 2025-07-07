@@ -143,13 +143,13 @@ public class EventoDAO implements EventoInterface {
     }
 
     @Override
-    public boolean temVagasDisponiveis(int eventoId) throws SQLException {
+    public boolean temVagasDisponiveis(int eventoID) throws SQLException {
         String sql = "SELECT vagas_disponivel FROM Evento WHERE id = ?";
 
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, eventoId);
+            stmt.setInt(1, eventoID);
             try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next() && rs.getInt(1) > 0;
             }

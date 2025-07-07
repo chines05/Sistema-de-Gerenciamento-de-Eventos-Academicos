@@ -11,28 +11,28 @@ import java.sql.*;
 public class InscricaoEventoDAO implements InscricaoEventoInterface {
 
     @Override
-    public void inscreverUsuario(int usuarioId, int eventoId)
+    public void inscreverUsuario(int userID, int eventoID)
             throws SQLException, VagasEsgotadasException, UsuarioJaInscritoException, InscricaoPendenteException, InscricaoNaoPermitidaException {
 
         EventoDAO eventoDAO = new EventoDAO();
 
-        if (!eventoDAO.temVagasDisponiveis(eventoId)) {
+        if (!eventoDAO.temVagasDisponiveis(eventoID)) {
             throw new VagasEsgotadasException("Não há vagas disponíveis para este evento!");
         }
 
-        if (usuarioTemInscricaoPendente(usuarioId, eventoId)) {
+        if (usuarioTemInscricaoPendente(userID, eventoID)) {
             throw new InscricaoPendenteException("Você já tem uma inscrição pendente para este evento!");
         }
 
-        if (usuarioJaInscrito(usuarioId, eventoId)) {
+        if (usuarioJaInscrito(userID, eventoID)) {
             throw new UsuarioJaInscritoException("Você já está inscrito neste evento!");
         }
 
-        if (usuarioJaRecusado(usuarioId, eventoId)) {
+        if (usuarioJaRecusado(userID, eventoID)) {
             throw new InscricaoNaoPermitidaException("Você já teve sua inscrição recusada para este evento!");
         }
 
-        if (usuarioJaPedente(usuarioId, eventoId)) {
+        if (usuarioJaPedente(userID, eventoID)) {
             throw new InscricaoNaoPermitidaException("Sua inscrição para este evento ainda está pendente!");
         }
 
@@ -41,14 +41,14 @@ public class InscricaoEventoDAO implements InscricaoEventoInterface {
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, usuarioId);
-            stmt.setInt(2, eventoId);
+            stmt.setInt(1, userID);
+            stmt.setInt(2, eventoID);
             stmt.executeUpdate();
         }
     }
 
     @Override
-    public void atualizarStatusInscricao(int inscricaoId, String status) throws SQLException {
+    public void atualizarStatusInscricao(int inscricaoID, String status) throws SQLException {
         if (!status.equals("CONFIRMADO") && !status.equals("RECUSADO") && !status.equals("PENDENTE")) {
             throw new SQLException("Status de inscrição inválido");
         }
@@ -68,13 +68,13 @@ public class InscricaoEventoDAO implements InscricaoEventoInterface {
 
             try (PreparedStatement stmtStatus = conn.prepareStatement(sql)) {
                 stmtStatus.setString(1, status);
-                stmtStatus.setInt(2, inscricaoId);
+                stmtStatus.setInt(2, inscricaoID);
                 stmtStatus.executeUpdate();
             }
 
             if (!atualizaVagas.isEmpty()) {
                 try (PreparedStatement stmtVagas = conn.prepareStatement(atualizaVagas)) {
-                    stmtVagas.setInt(1, inscricaoId);
+                    stmtVagas.setInt(1, inscricaoID);
                     stmtVagas.executeUpdate();
                 }
             }
@@ -129,7 +129,7 @@ public class InscricaoEventoDAO implements InscricaoEventoInterface {
         return sb.toString();
     }
 
-    private boolean usuarioJaInscrito(int usuarioId, int eventoId) throws SQLException {
+    private boolean usuarioJaInscrito(int userID, int eventoID) throws SQLException {
         String sql = """
         SELECT COUNT(*) FROM evento_user 
         WHERE usuario_id = ? AND evento_id = ? 
@@ -139,8 +139,8 @@ public class InscricaoEventoDAO implements InscricaoEventoInterface {
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, usuarioId);
-            stmt.setInt(2, eventoId);
+            stmt.setInt(1, userID);
+            stmt.setInt(2, eventoID);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next() && rs.getInt(1) > 0;
@@ -149,7 +149,7 @@ public class InscricaoEventoDAO implements InscricaoEventoInterface {
     }
 
     @Override
-    public boolean usuarioTemInscricaoPendente(int usuarioId, int eventoId) throws SQLException {
+    public boolean usuarioTemInscricaoPendente(int userID, int eventoID) throws SQLException {
         String sql = """
         SELECT COUNT(*) FROM evento_user 
         WHERE usuario_id = ? AND evento_id = ? 
@@ -159,8 +159,8 @@ public class InscricaoEventoDAO implements InscricaoEventoInterface {
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, usuarioId);
-            stmt.setInt(2, eventoId);
+            stmt.setInt(1, userID);
+            stmt.setInt(2, eventoID);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next() && rs.getInt(1) > 0;
@@ -169,12 +169,12 @@ public class InscricaoEventoDAO implements InscricaoEventoInterface {
     }
 
     @Override
-    public boolean usuarioJaRecusado(int usuarioId, int eventoId) throws SQLException {
+    public boolean usuarioJaRecusado(int userID, int eventoID) throws SQLException {
         String sql = "SELECT COUNT(*) FROM evento_user WHERE usuario_id = ? AND evento_id = ? AND status_pagamento = 'RECUSADO'";
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, usuarioId);
-            stmt.setInt(2, eventoId);
+            stmt.setInt(1, userID);
+            stmt.setInt(2, eventoID);
             try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next() && rs.getInt(1) > 0;
             }
@@ -182,12 +182,12 @@ public class InscricaoEventoDAO implements InscricaoEventoInterface {
     }
 
     @Override
-    public boolean usuarioJaPedente(int usuarioId, int eventoId) throws SQLException {
+    public boolean usuarioJaPedente(int userID, int eventoID) throws SQLException {
         String sql = "SELECT COUNT(*) FROM evento_user WHERE usuario_id = ? AND evento_id = ? AND status_pagamento = 'PENDENTE'";
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, usuarioId);
-            stmt.setInt(2, eventoId);
+            stmt.setInt(1, userID);
+            stmt.setInt(2, eventoID);
             try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next() && rs.getInt(1) > 0;
             }
@@ -195,7 +195,7 @@ public class InscricaoEventoDAO implements InscricaoEventoInterface {
     }
 
     @Override
-    public void cancelarInscricao(int usuarioId, int eventoId) throws SQLException {
+    public void cancelarInscricao(int userID, int eventoID) throws SQLException {
         String sql = "DELETE FROM evento_user WHERE usuario_id = ? AND evento_id = ?";
         String atualizaVagas = "UPDATE Evento SET vagas_disponivel = vagas_disponivel + 1 WHERE id = ?";
 
@@ -207,15 +207,15 @@ public class InscricaoEventoDAO implements InscricaoEventoInterface {
             try (PreparedStatement stmtDelete = conn.prepareStatement(sql);
                  PreparedStatement stmtVagas = conn.prepareStatement(atualizaVagas)) {
 
-                stmtDelete.setInt(1, usuarioId);
-                stmtDelete.setInt(2, eventoId);
+                stmtDelete.setInt(1, userID);
+                stmtDelete.setInt(2, eventoID);
                 int affectedRows = stmtDelete.executeUpdate();
 
                 if (affectedRows == 0) {
                     throw new SQLException("Inscrição não encontrada");
                 }
 
-                stmtVagas.setInt(1, eventoId);
+                stmtVagas.setInt(1, eventoID);
                 stmtVagas.executeUpdate();
 
                 conn.commit();
@@ -229,7 +229,7 @@ public class InscricaoEventoDAO implements InscricaoEventoInterface {
     }
 
     @Override
-    public String listarEventosConfirmadosDoUsuario(int usuarioId) throws SQLException {
+    public String listarEventosConfirmadosDoUsuario(int userID) throws SQLException {
         String sql = """
         SELECT e.id, e.nome, e.descricao, e.data_inicio, e.data_fim, 
                e.vagas_total, e.vagas_disponivel, eu.data_inscricao
@@ -244,7 +244,7 @@ public class InscricaoEventoDAO implements InscricaoEventoInterface {
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, usuarioId);
+            stmt.setInt(1, userID);
             ResultSet rs = stmt.executeQuery();
 
             if (!rs.isBeforeFirst()) {
