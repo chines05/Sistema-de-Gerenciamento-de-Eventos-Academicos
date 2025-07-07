@@ -28,7 +28,7 @@ public class Main {
 
     public static void criarTabelas() {
 
-        ConnectionFactory.criarTabelas();
+        connectionFactory.criarTabelas();
 
     }
 

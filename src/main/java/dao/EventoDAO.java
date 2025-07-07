@@ -6,7 +6,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import interefaces.EventoInterface;
+import interfaces.EventoInterface;
 
 public class EventoDAO implements EventoInterface {
 

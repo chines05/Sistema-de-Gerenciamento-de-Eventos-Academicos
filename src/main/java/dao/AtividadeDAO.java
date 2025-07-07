@@ -1,5 +1,6 @@
 package dao;
 
+import model.Atividade;
 import model.Evento;
 import utils.ConnectionFactory;
 
@@ -7,27 +8,31 @@ import java.sql.*;
 
 public class AtividadeDAO {
 
-    public void criarAtividade(Evento evento) throws SQLException {
-        String sql = "INSERT INTO Evento (nome, descricao, data_inicio, data_fim, vagas_total, vagas_disponivel) VALUES (?, ?, ?, ?, ?, ?)";
+    public void criarAtividade(Atividade atividade, int evento_id) throws SQLException {
+
+        String sql = "INSERT INTO ATIVIDADE (evento_id, nome, descricao, data_realizacao, hora_inicio, hora_fim, limite_inscritos, tipo) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, evento.getNome());
-            stmt.setString(2, evento.getDescricao());
-            stmt.setString(3, evento.getDataInicio());
-            stmt.setString(4, evento.getDataFim());
-            stmt.setInt(5, evento.getVagasTotal());
-            stmt.setInt(6, evento.getVagasDisponiveis());
+            stmt.setInt(1, evento_id);
+            stmt.setString(2, atividade.getNome());
+            stmt.setString(3, atividade.getDescricao());
+            stmt.setString(4, atividade.getDataRealizacao());
+            stmt.setString(5, atividade.getHoraInicio());
+            stmt.setString(6, atividade.getHoraFim());
+            stmt.setInt(7, atividade.getLimiteInscritos());
+            stmt.setString(8, atividade.getTipo());
 
             stmt.executeUpdate();
-
-            try (ResultSet rs = stmt.getGeneratedKeys()) {
-                if (rs.next()) {
-                    evento.setId(rs.getInt(1));
-                }
-            }
         }
+
+    }
+
+    public void busacarAtividadeId(int id) throws SQLException {
+
+        String sql = "SELECT * FROM "
+
     }
 
 }
