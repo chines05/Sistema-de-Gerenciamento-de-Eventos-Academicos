@@ -3,6 +3,7 @@ package dao;
 import exceptions.EmailDuplicadoException;
 import exceptions.EmailInvalidoException;
 import exceptions.SenhaFracaException;
+import interfaces.UserInterface;
 import model.Admin;
 import model.Participante;
 import model.User;
@@ -10,8 +11,9 @@ import org.mindrot.jbcrypt.BCrypt;
 import utils.ConnectionFactory;
 import java.sql.*;
 
-public class UserDAO {
+public class UserDAO implements UserInterface {
 
+    @Override
     public void createUser(Participante user) throws SQLException, EmailDuplicadoException, SenhaFracaException, EmailInvalidoException {
 
         if (!user.getEmail().matches("^[\\w-]+(\\.[\\w-]+)*@([\\w-]+\\.)+[a-zA-Z]{2,7}$")) {
@@ -53,6 +55,7 @@ public class UserDAO {
         }
     }
 
+    @Override
     public User login(String email, String senha) throws SQLException {
         String sql = "SELECT * FROM User WHERE email = ?";
 
@@ -93,7 +96,8 @@ public class UserDAO {
         return null;
     }
 
-    private boolean emailJaExistente(String email) throws SQLException {
+    @Override
+    public boolean emailJaExistente(String email) throws SQLException {
         String sql = "SELECT COUNT(*) FROM User WHERE email = ?";
 
         try (Connection conn = ConnectionFactory.getConnection();
