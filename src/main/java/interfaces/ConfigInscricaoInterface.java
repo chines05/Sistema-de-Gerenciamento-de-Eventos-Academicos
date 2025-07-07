@@ -12,4 +12,5 @@ public interface ConfigInscricaoInterface {
 
     public String listarValoresFormatado() throws SQLException;
 
+    
 }
