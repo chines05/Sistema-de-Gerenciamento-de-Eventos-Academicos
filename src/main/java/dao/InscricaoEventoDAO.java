@@ -3,12 +3,14 @@ package dao;
 import exceptions.InscricaoNaoPermitidaException;
 import exceptions.InscricaoPendenteException;
 import exceptions.VagasEsgotadasException;
+import interfaces.InscricaoEventoInterface;
 import exceptions.UsuarioJaInscritoException;
 import utils.ConnectionFactory;
 import java.sql.*;
 
-public class InscricaoEventoDAO {
+public class InscricaoEventoDAO implements InscricaoEventoInterface {
 
+    @Override
     public void inscreverUsuario(int usuarioId, int eventoId)
             throws SQLException, VagasEsgotadasException, UsuarioJaInscritoException, InscricaoPendenteException, InscricaoNaoPermitidaException {
 
@@ -45,6 +47,7 @@ public class InscricaoEventoDAO {
         }
     }
 
+    @Override
     public void atualizarStatusInscricao(int inscricaoId, String status) throws SQLException {
         if (!status.equals("CONFIRMADO") && !status.equals("RECUSADO") && !status.equals("PENDENTE")) {
             throw new SQLException("Status de inscrição inválido");
@@ -85,6 +88,7 @@ public class InscricaoEventoDAO {
         }
     }
 
+    @Override
     public String listarInscricoesPendentes() throws SQLException {
         String sql = """
         SELECT eu.id, u.nome as usuario_nome, u.email, e.nome as evento_nome, 
@@ -144,6 +148,7 @@ public class InscricaoEventoDAO {
         }
     }
 
+    @Override
     public boolean usuarioTemInscricaoPendente(int usuarioId, int eventoId) throws SQLException {
         String sql = """
         SELECT COUNT(*) FROM evento_user 
@@ -163,6 +168,7 @@ public class InscricaoEventoDAO {
         }
     }
 
+    @Override
     public boolean usuarioJaRecusado(int usuarioId, int eventoId) throws SQLException {
         String sql = "SELECT COUNT(*) FROM evento_user WHERE usuario_id = ? AND evento_id = ? AND status_pagamento = 'RECUSADO'";
         try (Connection conn = ConnectionFactory.getConnection();
@@ -175,6 +181,7 @@ public class InscricaoEventoDAO {
         }
     }
 
+    @Override
     public boolean usuarioJaPedente(int usuarioId, int eventoId) throws SQLException {
         String sql = "SELECT COUNT(*) FROM evento_user WHERE usuario_id = ? AND evento_id = ? AND status_pagamento = 'PENDENTE'";
         try (Connection conn = ConnectionFactory.getConnection();
@@ -187,6 +194,7 @@ public class InscricaoEventoDAO {
         }
     }
 
+    @Override
     public void cancelarInscricao(int usuarioId, int eventoId) throws SQLException {
         String sql = "DELETE FROM evento_user WHERE usuario_id = ? AND evento_id = ?";
         String atualizaVagas = "UPDATE Evento SET vagas_disponivel = vagas_disponivel + 1 WHERE id = ?";
@@ -220,6 +228,7 @@ public class InscricaoEventoDAO {
         }
     }
 
+    @Override
     public String listarEventosConfirmadosDoUsuario(int usuarioId) throws SQLException {
         String sql = """
         SELECT e.id, e.nome, e.descricao, e.data_inicio, e.data_fim, 
