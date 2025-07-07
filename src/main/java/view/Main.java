@@ -768,6 +768,4 @@ public class Main {
             System.err.println("Erro ao listar informações de pagamento: " + e.getMessage());
         }
     }
-
-
 }
