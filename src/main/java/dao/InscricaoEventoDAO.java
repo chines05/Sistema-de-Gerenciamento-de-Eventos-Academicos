@@ -270,4 +270,75 @@ public class InscricaoEventoDAO implements InscricaoEventoInterface {
         return sb.toString();
     }
 
+    @Override
+    public String listarTodasInscricoesDoUsuario(int userID) throws SQLException {
+        String sql = """
+            SELECT 
+                eu.id as inscricao_id,
+                e.id as evento_id,
+                e.nome as evento_nome,
+                eu.status_pagamento,
+                e.data_inicio,
+                e.data_fim,
+                eu.data_inscricao,
+                u.nome as usuario_nome,
+                u.role as tipo_usuario
+            FROM evento_user eu
+            JOIN Evento e ON eu.evento_id = e.id
+            JOIN User u ON eu.usuario_id = u.id
+            WHERE eu.usuario_id = ?
+            ORDER BY 
+                CASE eu.status_pagamento
+                    WHEN 'CONFIRMADO' THEN 1
+                    WHEN 'PENDENTE' THEN 2
+                    WHEN 'RECUSADO' THEN 3
+                    ELSE 4
+                END,
+                eu.data_inscricao DESC
+            """;
+
+        StringBuilder sb = new StringBuilder();
+
+        try (Connection conn = ConnectionFactory.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, userID);
+            ResultSet rs = stmt.executeQuery();
+
+            if (!rs.isBeforeFirst()) {
+                return "\nVocê não possui nenhuma inscrição em eventos.";
+            }
+
+            sb.append("\nTODAS AS SUAS INSCRIÇÕES EM EVENTOS\n");
+            sb.append(String.format("%-8s %-30s %-12s %-15s %-15s %-20s%n",
+                    "ID", "Evento", "Status", "Data Início", "Data Fim", "Data Inscrição"));
+            sb.append("------------------------------------------------------------------------------------------------\n");
+
+            while (rs.next()) {
+                String status = formatarStatus(rs.getString("status_pagamento"));
+                
+                sb.append(String.format("%-8d %-30s %-12s %-15s %-15s %-20s%n",
+                        rs.getInt("inscricao_id"),
+                        rs.getString("evento_nome"),
+                        status,
+                        rs.getString("data_inicio"),
+                        rs.getString("data_fim"),
+                        rs.getString("data_inscricao")));
+            }
+        } catch (SQLException e) {
+            throw new SQLException("Erro ao listar inscrições: " + e.getMessage());
+        }
+
+        return sb.toString();
+    }
+
+    private String formatarStatus(String status) {
+        return switch(status) {
+            case "CONFIRMADO" -> "CONFIRMADO";
+            case "PENDENTE" -> "PENDENTE";
+            case "RECUSADO" -> "RECUSADO";
+            default -> status;
+        };
+    }
+
 }

@@ -639,18 +639,19 @@ public class Main {
         int opcao;
         do {
             System.out.println("\nEscolha uma opção:");
+            System.out.println("-- Evento --");
             System.out.println("1 - Visualizar todos os eventos");
             System.out.println("2 - Se inscrever em um evento");
             System.out.println("3 - Visualizar eventos inscritos");
 
+            System.out.println("-- Atividade --");
             System.out.println("4 - Visualizar atividades do evento");
             System.out.println("5 - Inscrever-se em Atividade");
             System.out.println("6 - Visualizar atividades inscritas");
 
-            System.out.println("7 - Visualizar Informações da Atividade");
-            System.out.println("8 - Visualizar Atividades Inscritas");
-            System.out.println("9 - Visualizar Informações do Pagamento");
-            System.out.println("10 - Sair");
+            System.out.println("-- Pagamento --");
+            System.out.println("7 - Visualizar Informações do Pagamento");
+            System.out.println("8 - Sair");
             System.out.print("Opção: ");
 
             opcao = sc.nextInt();
@@ -669,12 +670,15 @@ public class Main {
                     visualizarAtividadesDoEvento(sc, participante.getId());
                     break;
                 case 5:
-                    // Visualizar Informações da Atividade
+                    // inscreverEmAtividade(sc, participante.getId());
                     break;
-                case 9:
-                    // Visualizar Informações do Pagamento
+                case 6:
+                    visualizarAtividadeInscritas(sc, participante.getId());
                     break;
-                case 10:
+                case 7:
+                    visualizarInformacoesPagamento(participante.getId());
+                    break;
+                case 8:
                     logout();
                     return;
                 default:
@@ -751,5 +755,19 @@ public class Main {
         }
 
     }
+
+    public static void visualizarAtividadeInscritas(Scanner sc, int userID) {
+
+    }
+
+    public static void visualizarInformacoesPagamento(int userID) {
+        try {
+            String informacoesPagamento = new InscricaoEventoDAO().listarTodasInscricoesDoUsuario(userID);
+            System.out.println(informacoesPagamento);
+        } catch (SQLException e) {
+            System.err.println("Erro ao listar informações de pagamento: " + e.getMessage());
+        }
+    }
+
 
 }
