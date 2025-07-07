@@ -12,10 +12,6 @@ public abstract class User {
         this.senha = senha;
     }
 
-    public abstract boolean login(String email, String senha);
-
-    public abstract void logout();
-
     public int getId() {
         return this.id;
     }
