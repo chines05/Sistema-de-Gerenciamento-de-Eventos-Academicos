@@ -6,8 +6,11 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EventoDAO {
+import interfaces.EventoInterface;
 
+public class EventoDAO implements EventoInterface {
+
+    @Override
     public void criarEvento(Evento evento) throws SQLException {
         String sql = "INSERT INTO Evento (nome, descricao, data_inicio, data_fim, vagas_total, vagas_disponivel) VALUES (?, ?, ?, ?, ?, ?)";
 
@@ -31,6 +34,7 @@ public class EventoDAO {
         }
     }
 
+    @Override
     public Evento buscarPorId(int id) throws SQLException {
         String sql = "SELECT * FROM Evento WHERE id = ?";
 
@@ -54,6 +58,7 @@ public class EventoDAO {
         return null;
     }
 
+    @Override
     public List<Evento> listarTodos() throws SQLException {
         List<Evento> eventos = new ArrayList<>();
         String sql = "SELECT * FROM Evento";
@@ -78,6 +83,7 @@ public class EventoDAO {
         return eventos;
     }
 
+    @Override
     public String listarEventosFormatados() throws SQLException {
         List<Evento> eventos = listarTodos();
         StringBuilder sb = new StringBuilder();
@@ -103,6 +109,7 @@ public class EventoDAO {
         return sb.toString();
     }
 
+    @Override
     public void editarEvento(Evento evento) throws SQLException {
         String sql = """
             UPDATE Evento 
@@ -123,6 +130,7 @@ public class EventoDAO {
         }
     }
 
+    @Override
     public void deletarEvento(int id) throws SQLException {
         String sql = "DELETE FROM Evento WHERE id = ?";
 
@@ -134,6 +142,7 @@ public class EventoDAO {
         }
     }
 
+    @Override
     public boolean temVagasDisponiveis(int eventoId) throws SQLException {
         String sql = "SELECT vagas_disponivel FROM Evento WHERE id = ?";
 
