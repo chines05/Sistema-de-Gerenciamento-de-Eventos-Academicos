@@ -11,9 +11,10 @@ public class Main {
 
     public static void main(String[] args) {
 
-//        criarTabelas();
+        criarTabelas();
         menuLogin();
-//        cadastrar();
+        //cadastrar();
+
     }
 
     public static void criarTabelas() {
@@ -122,7 +123,7 @@ public class Main {
         String senha = sc.nextLine().trim();
 
         String role = selecionarRole(sc);
-        if (role == null) return;
+        if (role == null) return; 
 
         try {
             UserDAO userDAO = new UserDAO();
@@ -652,10 +653,10 @@ public class Main {
                     visualizarEventosInscritos(participante.getId());
                     break;
                 case 4:
-                    visualizarAtividadesDoEvento(sc, participante.getId());
+                    visualizarAtividadesDoEvento(sc);
                     break;
                 case 5:
-                    // inscreverEmAtividade(sc, participante.getId());
+                    inscreverEmAtividade(sc, participante.getId());
                     break;
                 case 6:
                     visualizarAtividadeInscritas(sc, participante.getId());
@@ -700,7 +701,6 @@ public class Main {
             System.out.println("Inscrição realizada com sucesso! Aguarde confirmação.");
         } catch (InscricaoPendenteException e) {
             System.err.println("Erro: " + e.getMessage());
-            System.out.println("Você já tem uma inscrição pendente para este evento.");
         } catch (UsuarioJaInscritoException e) {
             System.err.println("Erro: " + e.getMessage());
         } catch (VagasEsgotadasException e) {
@@ -724,7 +724,7 @@ public class Main {
 
     }
 
-    public static void visualizarAtividadesDoEvento(Scanner sc, int userID) {
+    public static void visualizarAtividadesDoEvento(Scanner sc) {
 
         visualizarEventos();
 
@@ -741,8 +741,41 @@ public class Main {
 
     }
 
+    public static void inscreverEmAtividade(Scanner sc, int userID) {
+
+        System.out.println("\n--- Inscrever-se em Atividade ---");
+        visualizarAtividadesDoEvento(sc);
+
+        System.out.print("\nDigite o ID da atividade que deseja se inscrever: ");
+        int atividadeID = sc.nextInt();
+
+        try {
+            InscricaoAtividadeDAO inscricaoAtividadeDAO = new InscricaoAtividadeDAO();
+            inscricaoAtividadeDAO.inscreverUsuario(userID, atividadeID);
+            System.out.println("Inscrição realizada com sucesso! Aguarde confirmação.");
+        } catch (VagasEsgotadasException e) {
+            System.err.println("Erro: " + e.getMessage());
+        } catch (UsuarioJaInscritoException e) {
+            System.err.println("Erro: " + e.getMessage());
+        } catch (InscricaoNaoPermitidaException e) {
+            System.out.println("Erro: " + e.getMessage());
+        } catch (InscricaoPendenteException e) {
+            System.err.println("Erro: " + e.getMessage());
+        } catch (SQLException e) {
+            System.err.println("Erro no banco de dados: " + e.getMessage());
+        }
+
+    }
+
     public static void visualizarAtividadeInscritas(Scanner sc, int userID) {
 
+        try {
+            String atividadesInscritas = new InscricaoAtividadeDAO().listarAtividadesInscritas(userID);
+            System.out.println(atividadesInscritas);
+        } catch (SQLException e) {
+            System.err.println("Erro ao listar atividades inscritas: " + e.getMessage());
+        }
+        
     }
 
     public static void visualizarInformacoesPagamento(int userID) {

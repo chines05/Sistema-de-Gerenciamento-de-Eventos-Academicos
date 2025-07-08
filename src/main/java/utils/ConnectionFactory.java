@@ -71,6 +71,18 @@ public class ConnectionFactory {
         );
         """;
 
+        String sqlAtividade_user = """
+        CREATE TABLE IF NOT EXISTS atividade_user (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            usuario_id INTEGER NOT NULL,
+            atividade_id INTEGER NOT NULL,
+            data_inscricao DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (usuario_id) REFERENCES User(id),
+            FOREIGN KEY (atividade_id) REFERENCES Atividade(id),
+            UNIQUE (usuario_id, atividade_id)
+        );
+        """;
+
         String sqlConfigInscricao = """
         CREATE TABLE IF NOT EXISTS config_inscricao (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -116,6 +128,7 @@ public class ConnectionFactory {
             stmt.execute(sqlEventos);
             stmt.execute(sqlEvento_user);
             stmt.execute(sqlAtividade);
+            stmt.execute(sqlAtividade_user);
 
             stmt.execute(sqlConfigInscricao);
             stmt.execute(sqlInsertValores);

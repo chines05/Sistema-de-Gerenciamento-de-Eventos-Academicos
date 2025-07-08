@@ -120,7 +120,7 @@ public class AtividadeDAO {
     }
 
     public boolean temVagasDisponiveis(int atividadeID) throws SQLException {
-        String sql = "SELECT vagas_disponivel FROM Atividade WHERE id = ?";
+        String sql = "SELECT vagas_disponiveis FROM Atividade WHERE id = ?";
 
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
