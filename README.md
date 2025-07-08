@@ -73,5 +73,13 @@ Sistema desktop desenvolvido para:
             <artifactId>jbcrypt</artifactId>
             <version>0.4</version>
         </dependency>
+
+        <!--- Lombok -->
+       	<dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.38</version>
+            <scope>provided</scope>
+	    </dependency>
     </dependencies>
 ```
