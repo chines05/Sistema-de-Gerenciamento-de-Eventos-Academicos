@@ -1,0 +1,99 @@
+@startuml
+
+hide circle
+skinparam linetype ortho
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam roundCorner 10
+
+
+skinparam entity {
+  backgroundColor #AliceBlue
+  borderColor #2E86C1
+}
+skinparam arrow {
+  color #2E86C1
+}
+
+
+' --- ENTIDADES ---
+
+entity "User" as User {
+  + {PK} id: INTEGER
+  --
+  nome: TEXT
+  email: TEXT {UNIQUE}
+  senha: TEXT
+  role: TEXT
+  created_at: DATETIME
+}
+
+entity "Evento" as Evento {
+  + {PK} id: INTEGER
+  --
+  nome: TEXT
+  descricao: TEXT
+  data_inicio: DATETIME
+  data_fim: DATETIME
+  vagas_total: INTEGER
+  vagas_disponivel: INTEGER
+}
+
+
+entity "Atividade" as Atividade {
+  + {PK} id: INTEGER
+  --
+  # {FK} evento_id: INTEGER
+  nome: TEXT
+  descricao: TEXT
+  data_realizacao: DATETIME
+  hora_inicio: TIME
+  hora_fim: TIME
+  limite_inscritos: INTEGER
+  vagas_disponiveis: INTEGER
+  tipo: TEXT
+}
+
+entity "config_inscricao" as ConfigInscricao {
+  + {PK} id: INTEGER
+  --
+  role: TEXT {UNIQUE}
+  valor: REAL
+  created_at: DATETIME
+  updated_at: DATETIME
+}
+
+' --- JUNÇÃO ---
+
+entity "evento_user" as EventoUser {
+  + {PK} id: INTEGER
+  --
+  # {FK} usuario_id: INTEGER
+  # {FK} evento_id: INTEGER
+  data_inscricao: DATETIME
+  status_pagamento: TEXT
+}
+
+entity "atividade_user" as AtividadeUser {
+  + {PK} id: INTEGER
+  --
+  # {FK} usuario_id: INTEGER
+  # {FK} atividade_id: INTEGER
+  data_inscricao: DATETIME
+}
+
+
+' --- DEFINIÇÃO DOS RELACIONAMENTOS ---
+
+' Um Evento pode conter muitas Atividades
+Evento ||--o{ Atividade : "contém"
+
+' Um User pode se inscrever em muitos Eventos (através da tabela evento_user)
+User ||..o{ EventoUser : "faz inscrição"
+Evento ||..o{ EventoUser : "recebe inscrição"
+
+' Um User pode se inscrever em muitas Atividades (através da tabela atividade_user)
+User ||..o{ AtividadeUser : "faz inscrição"
+Atividade ||..o{ AtividadeUser : "recebe inscrição"
+
+@enduml
