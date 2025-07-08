@@ -22,7 +22,7 @@ public class EventoDAO implements EventoInterface {
             stmt.setString(3, evento.getDataInicio());
             stmt.setString(4, evento.getDataFim());
             stmt.setInt(5, evento.getVagasTotal());
-            stmt.setInt(6, evento.getVagasDisponiveis());
+            stmt.setInt(6, evento.getVagasDisponivel());
 
             stmt.executeUpdate();
 
@@ -103,7 +103,7 @@ public class EventoDAO implements EventoInterface {
                         evento.getDataInicio(),
                         evento.getDataFim(),
                         evento.getVagasTotal(),
-                        evento.getVagasDisponiveis()));
+                        evento.getVagasDisponivel()));
             }
         }
         return sb.toString();

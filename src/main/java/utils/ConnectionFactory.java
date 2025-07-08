@@ -120,9 +120,12 @@ public class ConnectionFactory {
         DROP TABLE IF EXISTS config_inscricao;
         """;
 
+        Connection conn = null;
+        Statement stmt = null;
+
         try  {
-            Connection conn = getConnection();
-            Statement stmt = conn.createStatement();
+            conn = getConnection();
+            stmt = conn.createStatement();
 
             stmt.execute(sqlUsuarios);
             stmt.execute(sqlEventos);
@@ -143,7 +146,20 @@ public class ConnectionFactory {
         } catch (SQLException e) {
             System.err.println("Erro ao criar tabelas: " + e.getMessage());
         } finally {
-            closeConnection(null);
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    System.err.println("Erro ao fechar Statement: " + e.getMessage());
+                }
+            }
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    System.err.println("Erro ao fechar Connection: " + e.getMessage());
+                }
+            }
         }
     }
 

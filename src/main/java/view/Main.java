@@ -9,11 +9,19 @@ import java.util.Scanner;
 
 public class Main {
 
+    private static Scanner sc = new Scanner(System.in);
+
     public static void main(String[] args) {
 
-        criarTabelas();
-        menuLogin();
-        //cadastrar();
+       try {
+            criarTabelas();
+            menuLogin();
+            //cadastrar();
+        } catch (Exception e) {
+            System.err.println("Erro: " + e.getMessage());
+        } finally {
+            sc.close();
+        }
 
     }
 
@@ -40,7 +48,7 @@ public class Main {
             System.out.println("2 - Cadastrar-se");
             System.out.println("3 - Sair");
             System.out.print("Opção: ");
-            opcao = new Scanner(System.in).nextInt();
+            opcao = sc.nextInt();
 
             switch (opcao) {
                 case 1:
@@ -60,8 +68,6 @@ public class Main {
     }
 
     public static void login() {
-
-        Scanner sc = new Scanner(System.in);
 
         System.out.println("\nFaça seu login");
         System.out.println("Entre com suas credenciais.");
@@ -107,8 +113,6 @@ public class Main {
     }
 
     public static void cadastrar() {
-
-        Scanner sc = new Scanner(System.in);
 
         System.out.println("\nCadastrar-se");
         System.out.println("Informe seus dados.");
@@ -188,8 +192,6 @@ public class Main {
 
     public static void menuAdmin() {
 
-        Scanner sc = new Scanner(System.in);
-
         System.out.println("--- Menu do Admin ---");
 
         int opcao;
@@ -209,7 +211,7 @@ public class Main {
                     menuEvento();
                     break;
                 case 2:
-                    menuAtividades(sc);
+                    menuAtividades();
                     break;
                 case 3:
                     menuValoresInscricoes();
@@ -227,8 +229,6 @@ public class Main {
 
     public static void menuEvento() {
 
-        Scanner sc = new Scanner(System.in);
-
         System.out.println("\n--- Menu do Evento ---");
 
         int opcao;
@@ -238,7 +238,7 @@ public class Main {
             System.out.println("2 - Criar Evento");
             System.out.println("3 - Editar Evento");
             System.out.println("4 - Excluir Evento");
-            System.out.println("5 - Menu confirmar/cancelar inscricoes");
+            System.out.println("5 - Menu confirmar/recusar inscricoes");
             System.out.println("6 - Sair");
 
             System.out.print("Opção: ");
@@ -250,13 +250,13 @@ public class Main {
                     visualizarEventos();
                     break;
                 case 2:
-                    criarEvento(sc);
+                    criarEvento();
                     break;
                 case 3:
-                    editarEvento(sc);
+                    editarEvento();
                     break;
                 case 4:
-                    deletarEvento(sc);
+                    deletarEvento();
                     break;
                 case 5:
                     menuConfirmarInscricoes();
@@ -282,7 +282,7 @@ public class Main {
 
     }
 
-    public static void criarEvento(Scanner sc) {
+    public static void criarEvento() {
 
         System.out.println("\n--- Criar Evento ---");
         System.out.println("Digite as informações do evento:");
@@ -314,7 +314,7 @@ public class Main {
 
     }
 
-    public static void editarEvento(Scanner sc) {
+    public static void editarEvento() {
 
         System.out.println("\n--- Editar Evento ---");
         System.out.println("Digite as informações do evento:");
@@ -347,7 +347,7 @@ public class Main {
 
     }
 
-    public static void deletarEvento(Scanner sc) {
+    public static void deletarEvento() {
 
         System.out.println("\n--- Deletar Evento ---");
 
@@ -384,7 +384,6 @@ public class Main {
 
     public static void menuConfirmarInscricoes() {
 
-        Scanner sc = new Scanner(System.in);
         InscricaoEventoDAO inscricaoDAO = new InscricaoEventoDAO();
 
         try {
@@ -443,7 +442,7 @@ public class Main {
             System.out.println("2 - Editar Valores");
             System.out.println("3 - Sair");
             System.out.print("Opção: ");
-            opcao = new Scanner(System.in).nextInt();
+            opcao = sc.nextInt();
 
             switch (opcao) {
                 case 1:
@@ -474,8 +473,6 @@ public class Main {
 
     public static void editarValoresInscricoes() {
 
-        Scanner sc = new Scanner(System.in);
-
         System.out.println("\n--- Editar Valores ---");
 
         System.out.print("Digite o role do participante: ");
@@ -497,7 +494,7 @@ public class Main {
 
     }
 
-    public static void menuAtividades(Scanner sc) {
+    public static void menuAtividades() {
 
         System.out.println("\n--- Menu de Atividades ---");
 
@@ -513,10 +510,10 @@ public class Main {
 
             switch (opcao) {
                 case 1:
-                    criarAtividade(sc);
+                    criarAtividade();
                     break;
                 case 2:
-                    listarAtividades(sc);
+                    listarAtividades();
                     break;
                 case 3:
                     return;
@@ -526,7 +523,7 @@ public class Main {
         } while (opcao != 3);
     }
 
-    public static void criarAtividade(Scanner sc) {
+    public static void criarAtividade() {
 
         visualizarEventos();
         
@@ -555,7 +552,7 @@ public class Main {
         int limiteInscritos = sc.nextInt();
         sc.nextLine();
 
-        String tipo = tipoAtividade(sc);
+        String tipo = tipoAtividade();
 
         try {
             Atividade atividade = new Atividade(nome, descricao, dataRealizacao, horaInicio, horaFim, limiteInscritos, limiteInscritos, tipo);
@@ -567,7 +564,8 @@ public class Main {
 
     }
 
-    public static String tipoAtividade(Scanner sc) {
+    public static String tipoAtividade() {
+
         System.out.print("Qual o tipo da atividade: ");
         
         int opcao;
@@ -597,7 +595,7 @@ public class Main {
         return tipo;
     }
 
-    public static void listarAtividades(Scanner sc) {
+    public static void listarAtividades() {
 
         visualizarEventos();
 
@@ -615,8 +613,6 @@ public class Main {
     }
 
     public static void menuParticipante(Participante participante) {
-
-        Scanner sc = new Scanner(System.in);
 
         System.out.println("--- Menu do Participante ---");
 
@@ -645,16 +641,16 @@ public class Main {
                     visualizarEventos();
                     break;
                 case 2:
-                    inscreverEmEvento(sc, participante.getId(), participante.getRole());
+                    inscreverEmEvento(participante.getId(), participante.getRole());
                     break;
                 case 3:
                     visualizarEventosInscritos(participante.getId());
                     break;
                 case 4:
-                    visualizarAtividadesDoEvento(sc);
+                    visualizarAtividadesDoEvento();
                     break;
                 case 5:
-                    inscreverEmAtividade(sc, participante.getId());
+                    inscreverEmAtividade(participante.getId());
                     break;
                 case 6:
                     visualizarAtividadeInscritas(participante.getId());
@@ -684,7 +680,7 @@ public class Main {
 
     }
 
-    public static void inscreverEmEvento(Scanner sc, int userID, String role) {
+    public static void inscreverEmEvento(int userID, String role) {
         
         System.out.println("\n--- Inscrever-se em Evento ---");
         visualizarEventos();
@@ -723,7 +719,7 @@ public class Main {
 
     }
 
-    public static void visualizarAtividadesDoEvento(Scanner sc) {
+    public static void visualizarAtividadesDoEvento() {
 
         visualizarEventos();
 
@@ -740,10 +736,10 @@ public class Main {
 
     }
 
-    public static void inscreverEmAtividade(Scanner sc, int userID) {
+    public static void inscreverEmAtividade(int userID) {
 
         System.out.println("\n--- Inscrever-se em Atividade ---");
-        visualizarAtividadesDoEvento(sc);
+        visualizarAtividadesDoEvento();
 
         System.out.print("\nDigite o ID da atividade que deseja se inscrever: ");
         int atividadeID = sc.nextInt();

@@ -1,6 +1,12 @@
 package model;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class Evento {
+
     private int id;
     private String nome;
     private String descricao;
@@ -25,60 +31,5 @@ public class Evento {
         this.dataInicio = dataInicio;
         this.dataFim = dataFim;
     }
-
-    public int getId() {
-        return this.id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getNome() {
-        return this.nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getDescricao() {
-        return this.descricao;
-    }
-
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
-    }
-
-    public String getDataInicio() {
-        return this.dataInicio;
-    }
-
-    public void setDataInicio(String dataInicio) {
-        this.dataInicio = dataInicio;
-    }
-
-    public String getDataFim() {
-        return this.dataFim;
-    }
-
-    public void setDataFim(String dataFim) {
-        this.dataFim = dataFim;
-    }
-
-    public int getVagasTotal() {
-        return this.vagasTotal;
-    }
-
-    public void setVagasTotal(int vagasTotal) {
-        this.vagasTotal = vagasTotal;
-    }
-
-    public int getVagasDisponiveis() {
-        return this.vagasDisponivel;
-    }
-
-    public void setVagasDisponiveis(int vagasDisponivel) {
-        this.vagasDisponivel = vagasDisponivel;
-    }
+    
 }

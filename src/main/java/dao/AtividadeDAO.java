@@ -17,11 +17,11 @@ public class AtividadeDAO {
             stmt.setInt(1, eventoID);
             stmt.setString(2, atividade.getNome());
             stmt.setString(3, atividade.getDescricao());
-            stmt.setString(4, atividade.getDataRealizacao());
-            stmt.setString(5, atividade.getHoraInicio());
-            stmt.setString(6, atividade.getHoraFim());
-            stmt.setInt(7, atividade.getLimiteInscritos());
-            stmt.setInt(8, atividade.getLimiteInscritos()); 
+            stmt.setString(4, atividade.getData_realizacao());
+            stmt.setString(5, atividade.getHora_inicio());
+            stmt.setString(6, atividade.getHora_fim());
+            stmt.setInt(7, atividade.getLimite_inscritos());
+            stmt.setInt(8, atividade.getLimite_inscritos()); 
             stmt.setString(9, atividade.getTipo());
 
             stmt.executeUpdate();
@@ -96,11 +96,11 @@ public class AtividadeDAO {
             
             stmt.setString(1, atividade.getNome());
             stmt.setString(2, atividade.getDescricao());
-            stmt.setString(3, atividade.getDataRealizacao());
-            stmt.setString(4, atividade.getHoraInicio());
-            stmt.setString(5, atividade.getHoraFim());
-            stmt.setInt(6, atividade.getLimiteInscritos());
-            stmt.setInt(7, atividade.getVagasDisponivel());
+            stmt.setString(3, atividade.getData_realizacao());
+            stmt.setString(4, atividade.getHora_inicio());
+            stmt.setString(5, atividade.getHora_fim());
+            stmt.setInt(6, atividade.getLimite_inscritos());
+            stmt.setInt(7, atividade.getVagas_disponivel());
             stmt.setString(8, atividade.getTipo());
             stmt.setInt(9, atividade.getId());
 
@@ -148,11 +148,11 @@ public class AtividadeDAO {
                 sb.append(String.format("%-5d %-30s %-15s %-10s %-10s %-10d %-10d %-15s%n",
                         atividade.getId(),
                         atividade.getNome(),
-                        atividade.getDataRealizacao(),
-                        atividade.getHoraInicio(),
-                        atividade.getHoraFim(),
-                        atividade.getLimiteInscritos(),
-                        atividade.getVagasDisponivel(),
+                        atividade.getData_realizacao(),
+                        atividade.getHora_inicio(),
+                        atividade.getHora_fim(),
+                        atividade.getLimite_inscritos(),
+                        atividade.getVagas_disponivel(),
                         atividade.getTipo()));
             }
         }
