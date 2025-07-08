@@ -1,16 +1,8 @@
 package view;
 
-import dao.AtividadeDAO;
-import dao.ConfigInscricaoDAO;
-import dao.EventoDAO;
-import dao.InscricaoEventoDAO;
+import dao.*;
 import exceptions.*;
-import model.Admin;
-import model.Atividade;
-import dao.UserDAO;
-import model.Evento;
-import model.Participante;
-import model.User;
+import model.*;
 import utils.ConnectionFactory;
 import java.sql.SQLException;
 import java.util.Scanner;
@@ -761,7 +753,4 @@ public class Main {
             System.err.println("Erro ao listar informações de pagamento: " + e.getMessage());
         }
     }
-
-    // teste
- 
 }
