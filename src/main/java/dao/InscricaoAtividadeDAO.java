@@ -3,12 +3,14 @@ package dao;
 import exceptions.InscricaoNaoPermitidaException;
 import exceptions.InscricaoPendenteException;
 import exceptions.VagasEsgotadasException;
+import interfaces.InscricaoAtividadeInterface;
 import exceptions.UsuarioJaInscritoException;
 import utils.ConnectionFactory;
 import java.sql.*;
 
-public class InscricaoAtividadeDAO {
+public class InscricaoAtividadeDAO implements InscricaoAtividadeInterface {
 
+    @Override
     public void inscreverUsuario(int userID, int AtividadeID)
             throws SQLException, VagasEsgotadasException, UsuarioJaInscritoException, InscricaoPendenteException, InscricaoNaoPermitidaException {
 
@@ -60,6 +62,7 @@ public class InscricaoAtividadeDAO {
         }
     }
 
+    @Override
     public String listarAtividadesInscritas(int userID) throws SQLException {
         String sql = """
         SELECT a.id, a.nome, a.descricao, a.data_realizacao, a.hora_inicio, a.hora_fim, 
