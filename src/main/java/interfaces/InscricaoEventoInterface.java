@@ -22,7 +22,7 @@ public interface InscricaoEventoInterface {
 
     public boolean usuarioJaPedente(int usuarioId, int eventoId) throws SQLException;
 
-    public void cancelarInscricao(int usuarioId, int eventoId) throws SQLException;
+    public void cancelarInscricao(int inscricaoId) throws SQLException ;
 
     public String listarEventosConfirmadosDoUsuario(int usuarioId) throws SQLException;
 
