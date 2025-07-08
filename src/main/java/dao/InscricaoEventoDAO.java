@@ -194,37 +194,62 @@ public class InscricaoEventoDAO implements InscricaoEventoInterface {
         }
     }
 
+
     @Override
-    public void cancelarInscricao(int userID, int eventoID) throws SQLException {
-        String sql = "DELETE FROM evento_user WHERE usuario_id = ? AND evento_id = ?";
-        String atualizaVagas = "UPDATE Evento SET vagas_disponivel = vagas_disponivel + 1 WHERE id = ?";
+    public void cancelarInscricao(int inscricaoId) throws SQLException {
+        String sqlSelect = "SELECT status_pagamento, evento_id FROM evento_user WHERE id = ?";
+        String sqlDelete = "DELETE FROM evento_user WHERE id = ?";
+        String sqlUpdateVagas = "UPDATE Evento SET vagas_disponivel = vagas_disponivel + 1 WHERE id = ?";
 
         Connection conn = null;
         try {
             conn = ConnectionFactory.getConnection();
             conn.setAutoCommit(false);
 
-            try (PreparedStatement stmtDelete = conn.prepareStatement(sql);
-                 PreparedStatement stmtVagas = conn.prepareStatement(atualizaVagas)) {
+            String status = null;
+            int eventoId = -1;
 
-                stmtDelete.setInt(1, userID);
-                stmtDelete.setInt(2, eventoID);
-                int affectedRows = stmtDelete.executeUpdate();
-
-                if (affectedRows == 0) {
-                    throw new SQLException("Inscrição não encontrada");
+            try (PreparedStatement stmtSelect = conn.prepareStatement(sqlSelect)) {
+                stmtSelect.setInt(1, inscricaoId);
+                try (ResultSet rs = stmtSelect.executeQuery()) {
+                    if (rs.next()) {
+                        status = rs.getString("status_pagamento");
+                        eventoId = rs.getInt("evento_id");
+                    } else {
+                        throw new SQLException("Inscrição com ID " + inscricaoId + " não encontrada.");
+                    }
                 }
-
-                stmtVagas.setInt(1, eventoID);
-                stmtVagas.executeUpdate();
-
-                conn.commit();
             }
+
+            try (PreparedStatement stmtDelete = conn.prepareStatement(sqlDelete)) {
+                stmtDelete.setInt(1, inscricaoId);
+                int affectedRows = stmtDelete.executeUpdate();
+                if (affectedRows == 0) {
+                    throw new SQLException("Falha ao deletar a inscrição. Nenhuma linha afetada.");
+                }
+            }
+
+            if ("CONFIRMADO".equals(status)) {
+                try (PreparedStatement stmtUpdate = conn.prepareStatement(sqlUpdateVagas)) {
+                    stmtUpdate.setInt(1, eventoId);
+                    stmtUpdate.executeUpdate();
+                }
+            }
+
+            conn.commit();
+            System.out.println("Operação de cancelamento concluída com sucesso.");
+
         } catch (SQLException e) {
-            if (conn != null) conn.rollback();
+            if (conn != null) {
+                System.err.println("Ocorreu um erro. Desfazendo operações (rollback)...");
+                conn.rollback();
+        }
             throw e;
         } finally {
-            if (conn != null) conn.setAutoCommit(true);
+            if (conn != null) {
+                conn.setAutoCommit(true);
+                conn.close();
+            }
         }
     }
 

@@ -41,14 +41,22 @@ public class Main {
 
         bemVindo();
 
-        int opcao;
+        int opcao = 0;
         do {
             System.out.println("\nEscolha uma opção:");
             System.out.println("1 - Fazer login");
             System.out.println("2 - Cadastrar-se");
             System.out.println("3 - Sair");
             System.out.print("Opção: ");
-            opcao = sc.nextInt();
+
+            try {
+                String linha = sc.nextLine();
+
+                opcao = Integer.parseInt(linha);
+            } catch (NumberFormatException e) {
+                System.out.println("Erro: Por favor, digite um número válido.");
+                continue;
+            }
 
             switch (opcao) {
                 case 1:
@@ -612,6 +620,41 @@ public class Main {
 
     }
 
+    public static void cancelarInscricaoEvento(int usuarioId) {
+        System.out.println("\n--- Cancelar Inscrição em Evento ---");
+        InscricaoEventoDAO inscricaoDAO = new InscricaoEventoDAO();
+
+        try {
+            String minhasInscricoes = inscricaoDAO.listarTodasInscricoesDoUsuario(usuarioId);
+            System.out.println(minhasInscricoes);
+
+            if (minhasInscricoes.contains("Você não possui nenhuma inscrição")) {
+                return;
+            }
+
+            System.out.print("\nDigite o ID da inscrição que deseja cancelar (ou 0 para voltar): ");
+            int inscricaoId = sc.nextInt();
+            sc.nextLine();
+
+            if (inscricaoId == 0) {
+                return;
+            }
+            System.out.print("Tem certeza que deseja cancelar a inscrição de ID " + inscricaoId + "? (S/N): ");
+            String confirmacao = sc.nextLine();
+
+            if (confirmacao.equalsIgnoreCase("S")) {
+
+                inscricaoDAO.cancelarInscricao(inscricaoId);
+                System.out.println("Inscrição cancelada com sucesso!");
+            } else {
+                System.out.println("Operação cancelada.");
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao processar o cancelamento: " + e.getMessage());
+        }
+    }
+
     public static void menuParticipante(Participante participante) {
 
         System.out.println("--- Menu do Participante ---");
@@ -631,10 +674,12 @@ public class Main {
 
             System.out.println("-- Pagamento --");
             System.out.println("7 - Visualizar Informações do Pagamento");
-            System.out.println("8 - Sair");
+            System.out.println("8 - Cancelar Inscrição em Evento");
+            System.out.println("9 - Sair");
             System.out.print("Opção: ");
 
             opcao = sc.nextInt();
+            sc.nextLine();
 
             switch (opcao) {
                 case 1:
@@ -659,6 +704,9 @@ public class Main {
                     visualizarInformacoesPagamento(participante.getId());
                     break;
                 case 8:
+                    cancelarInscricaoEvento(participante.getId());
+                    break;
+                case 9:
                     logout();
                     return;
                 default:
