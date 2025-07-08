@@ -7,9 +7,9 @@ import interfaces.UserInterface;
 import model.Admin;
 import model.Participante;
 import model.User;
-import org.mindrot.jbcrypt.BCrypt;
 import utils.ConnectionFactory;
 import java.sql.*;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class UserDAO implements UserInterface {
 

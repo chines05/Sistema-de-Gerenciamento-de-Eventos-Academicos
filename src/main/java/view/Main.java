@@ -4,13 +4,10 @@ import dao.*;
 import exceptions.*;
 import model.*;
 import utils.ConnectionFactory;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Scanner;
 
 public class Main {
-
-    private static ConnectionFactory connectionFactory = new ConnectionFactory();
 
     public static void main(String[] args) {
 
@@ -23,10 +20,6 @@ public class Main {
 
         ConnectionFactory.criarTabelas();
 
-    }
-
-    public static void closeConnection() {
-        ConnectionFactory.closeConnection((Connection) connectionFactory);
     }
 
     public static void bemVindo() {
