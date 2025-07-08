@@ -80,6 +80,6 @@ Sistema desktop desenvolvido para:
           <artifactId>lombok</artifactId>
           <version>1.18.38</version>
           <scope>provided</scope>
-	      </dependency>
+	</dependency>
     </dependencies>
 ```
