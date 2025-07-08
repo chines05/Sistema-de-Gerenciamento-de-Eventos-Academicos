@@ -618,8 +618,6 @@ public class Main {
 
         Scanner sc = new Scanner(System.in);
 
-        InscricaoEventoDAO inscricaoDAO = new InscricaoEventoDAO();
-
         System.out.println("--- Menu do Participante ---");
 
         int opcao;
@@ -647,7 +645,7 @@ public class Main {
                     visualizarEventos();
                     break;
                 case 2:
-                    inscreverEmEvento(sc, participante.getId(), inscricaoDAO, participante.getRole());
+                    inscreverEmEvento(sc, participante.getId(), participante.getRole());
                     break;
                 case 3:
                     visualizarEventosInscritos(participante.getId());
@@ -659,7 +657,7 @@ public class Main {
                     inscreverEmAtividade(sc, participante.getId());
                     break;
                 case 6:
-                    visualizarAtividadeInscritas(sc, participante.getId());
+                    visualizarAtividadeInscritas(participante.getId());
                     break;
                 case 7:
                     visualizarInformacoesPagamento(participante.getId());
@@ -686,17 +684,18 @@ public class Main {
 
     }
 
-    public static void inscreverEmEvento(Scanner sc, int userID, InscricaoEventoDAO inscricaoDAO, String role) {
-
+    public static void inscreverEmEvento(Scanner sc, int userID, String role) {
+        
         System.out.println("\n--- Inscrever-se em Evento ---");
         visualizarEventos();
-
+        
         valorInscricaoUser(role);
-
+        
         System.out.print("\nDigite o ID do evento que deseja se inscrever: ");
         int eventoID = sc.nextInt();
-
+        
         try {
+            InscricaoEventoDAO inscricaoDAO = new InscricaoEventoDAO();
             inscricaoDAO.inscreverUsuario(userID, eventoID);
             System.out.println("Inscrição realizada com sucesso! Aguarde confirmação.");
         } catch (InscricaoPendenteException e) {
@@ -767,7 +766,7 @@ public class Main {
 
     }
 
-    public static void visualizarAtividadeInscritas(Scanner sc, int userID) {
+    public static void visualizarAtividadeInscritas(int userID) {
 
         try {
             String atividadesInscritas = new InscricaoAtividadeDAO().listarAtividadesInscritas(userID);
