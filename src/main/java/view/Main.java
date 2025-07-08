@@ -16,7 +16,6 @@ public class Main {
        try {
             criarTabelas();
             menuLogin();
-            //cadastrar();
         } catch (Exception e) {
             System.err.println("Erro: " + e.getMessage());
         } finally {
@@ -134,7 +133,8 @@ public class Main {
         System.out.print("Senha (mínimo 6 caracteres): ");
         String senha = sc.nextLine().trim();
 
-        String role = selecionarRole(sc);
+        System.out.println("\nTipo de conta:");
+        String role = selecionarRole();
         if (role == null) return; 
 
         try {
@@ -171,10 +171,9 @@ public class Main {
 
     }
 
-    public static String selecionarRole(Scanner sc) {
+    public static String selecionarRole() {
 
         while (true) {
-            System.out.println("\nTipo de conta:");
             System.out.println("1 - Aluno");
             System.out.println("2 - Professor");
             System.out.println("3 - Profissional");
@@ -483,13 +482,14 @@ public class Main {
 
         System.out.println("\n--- Editar Valores ---");
 
-        System.out.print("Digite o role do participante: ");
-        String role = sc.nextLine();
+        sc.nextLine();
+
+        System.out.println("Escolha o tipo de conta que deseja editar:");
+        String role = selecionarRole();
+        if (role == null) return; 
 
         System.out.print("Digite o novo valor: ");
         String novoValor = sc.nextLine();
-
-        sc.nextLine();
 
         try {
             new ConfigInscricaoDAO().atualizarValorInscricao(role, novoValor);
