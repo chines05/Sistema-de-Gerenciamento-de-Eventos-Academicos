@@ -1,16 +1,8 @@
 package view;
 
-import dao.AtividadeDAO;
-import dao.ConfigInscricaoDAO;
-import dao.EventoDAO;
-import dao.InscricaoEventoDAO;
+import dao.*;
 import exceptions.*;
-import model.Admin;
-import model.Atividade;
-import dao.UserDAO;
-import model.Evento;
-import model.Participante;
-import model.User;
+import model.*;
 import utils.ConnectionFactory;
 import java.sql.Connection;
 import java.sql.SQLException;
