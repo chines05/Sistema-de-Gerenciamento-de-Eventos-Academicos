@@ -17,8 +17,6 @@ import java.util.Scanner;
 
 public class Main {
 
-    private static ConnectionFactory connectionFactory = new ConnectionFactory();
-
     public static void main(String[] args) {
 
 //        criarTabelas();
