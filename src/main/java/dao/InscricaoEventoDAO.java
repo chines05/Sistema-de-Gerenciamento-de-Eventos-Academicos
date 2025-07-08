@@ -197,9 +197,8 @@ public class InscricaoEventoDAO implements InscricaoEventoInterface {
 
     @Override
     public void cancelarInscricao(int inscricaoId) throws SQLException {
-        String sqlSelect = "SELECT status_pagamento, evento_id FROM evento_user WHERE id = ?";
+        String sqlSelect = "SELECT status_pagamento FROM evento_user WHERE id = ?";
         String sqlDelete = "DELETE FROM evento_user WHERE id = ?";
-        String sqlUpdateVagas = "UPDATE Evento SET vagas_disponivel = vagas_disponivel + 1 WHERE id = ?";
 
         Connection conn = null;
         try {
@@ -207,14 +206,16 @@ public class InscricaoEventoDAO implements InscricaoEventoInterface {
             conn.setAutoCommit(false);
 
             String status = null;
-            int eventoId = -1;
 
             try (PreparedStatement stmtSelect = conn.prepareStatement(sqlSelect)) {
                 stmtSelect.setInt(1, inscricaoId);
                 try (ResultSet rs = stmtSelect.executeQuery()) {
                     if (rs.next()) {
                         status = rs.getString("status_pagamento");
-                        eventoId = rs.getInt("evento_id");
+
+                        if (!"PENDENTE".equals(status)) {
+                            throw new SQLException("Inscrições só podem ser canceladas se estiverem com status PENDENTE.");
+                        }
                     } else {
                         throw new SQLException("Inscrição com ID " + inscricaoId + " não encontrada.");
                     }
@@ -229,21 +230,13 @@ public class InscricaoEventoDAO implements InscricaoEventoInterface {
                 }
             }
 
-            if ("CONFIRMADO".equals(status)) {
-                try (PreparedStatement stmtUpdate = conn.prepareStatement(sqlUpdateVagas)) {
-                    stmtUpdate.setInt(1, eventoId);
-                    stmtUpdate.executeUpdate();
-                }
-            }
-
             conn.commit();
-            System.out.println("Operação de cancelamento concluída com sucesso.");
+            System.out.println("Cancelamento de inscrição pendente realizado com sucesso.");
 
         } catch (SQLException e) {
             if (conn != null) {
-                System.err.println("Ocorreu um erro. Desfazendo operações (rollback)...");
                 conn.rollback();
-        }
+            }
             throw e;
         } finally {
             if (conn != null) {
@@ -252,6 +245,7 @@ public class InscricaoEventoDAO implements InscricaoEventoInterface {
             }
         }
     }
+
 
     @Override
     public String listarEventosConfirmadosDoUsuario(int userID) throws SQLException {
